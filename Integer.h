@@ -16,35 +16,35 @@ class Integer : public numberobj {
 public:
 	string m_name;
 	Integer();
-	Integer(const string&);
+	Integer(string);
 	Integer(const Integer&);
-	Integer operator=(const Integer&);
+	Integer operator=(const Integer);
 	Integer operator=(const string&);
 
 	void CALC_assign(string);
 
 	Integer operator!();
-	Integer operator^(const Integer&);
+	Integer operator^(const Integer);
 
 	Integer operator+();
 	Integer operator-();
 
-	Integer operator*(const Integer&);
-	Integer operator/(const Integer&);
+	Integer operator*(const Integer);
+	Integer operator/(const Integer);
 
-	Integer operator+(const Integer&);
-	Integer operator-(const Integer&);
+	Integer operator+(const Integer);
+	Integer operator-(const Integer);
 
-	friend istream& operator>> (istream&, Integer&);
-	friend ostream& operator<< (ostream&, Integer&);
+	friend istream& operator>> (istream&, Integer);
+	friend ostream& operator<< (ostream&, Integer);
 
 private:
 	int m_digit; 	// digit
 	bool m_posti; 		// postive == 1
-	vector<char> m_val; //
+	string  m_val; //
 };
 
-istream& operator>> (istream&, Integer&);
-ostream& operator<< (ostream&, Integer&);
+istream& operator>> (istream&, Integer);
+ostream& operator<< (ostream&, Integer);
 
 #endif

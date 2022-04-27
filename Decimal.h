@@ -16,30 +16,49 @@ class Decimal : public Integer{
 public:
 
 	Decimal();
-	Decimal operator=(Decimal&);
-	Decimal operator=(Integer&);
-	Decimal operator=(string&);
+	Decimal(const Decimal&);
+	Decimal(const Integer);
+	Decimal(const string);
+	Decimal operator=(Decimal);
+	Decimal operator=(Integer);
+	Decimal operator=(string);
 
 	void CALC_assign(string);
+
 	Decimal operator!();
-	Decimal operator^(const Decimal&);
+	Decimal operator^(const Decimal);
+	Decimal operator^(const Integer);
+	friend Decimal operator^( const Integer, const Decimal);
 
 	Decimal operator+();
 	Decimal operator-();
 
-	Decimal operator*(const Decimal&);
-	Decimal operator/(const Decimal&);
+	Decimal operator*(const Decimal);
+	Decimal operator*(const Integer);
+	friend Decimal operator*( const Integer, const Decimal);
+	Decimal operator/(const Decimal);
+	Decimal operator/(const Integer);
+	friend Decimal operator/( const Integer, const Decimal);
 
-	Decimal operator+(const Decimal&);
-	Decimal operator-(const Decimal&);
+	Decimal operator+(const Decimal);
+	Decimal operator+(const Integer);
+	friend Decimal operator+( const Integer, const Decimal);
+	Decimal operator-(const Decimal);
+	Decimal operator-(const Integer);
+	friend Decimal operator-( const Integer, const Decimal);
 
-	friend istream& operator>> (istream&, Decimal&);
-	friend ostream& operator<< (ostream&, Decimal&);
+	friend istream& operator>> (istream&, Decimal);
+	friend ostream& operator<< (ostream&, Decimal);
 private:
-	Integer denum, num;
+	Integer m_denum, m_num;
 };
 
-istream& operator>> (istream&, Decimal&);
-ostream& operator<< (ostream&, Decimal&);
+istream& operator>> (istream&, Decimal);
+ostream& operator<< (ostream&, Decimal);
 
+Decimal operator^( const Integer, const Decimal);
+Decimal operator*( const Integer, const Decimal);
+Decimal operator/( const Integer, const Decimal);
+Decimal operator+( const Integer, const Decimal);
+Decimal operator-( const Integer, const Decimal);
 #endif
