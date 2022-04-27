@@ -21,35 +21,9 @@ using std::string;
 
 class numberobj{
 public:
-	// ~numberobj();
 
-	// numberobj(numberobj& t_new);
-	// numberobj& operator=(const numberobj&);
-
-	virtual void CALC_assign(string) = 0;
-
-	virtual numberobj* operator!() = 0;
-	virtual numberobj* operator^(const numberobj&) = 0;
-
-	virtual numberobj* operator+() = 0;
-	virtual numberobj* operator-() = 0;
-
-	virtual numberobj* operator*(const numberobj&) = 0;
-	virtual numberobj* operator/(const numberobj&) = 0;
-
-	virtual numberobj* operator+(const numberobj&) = 0;
-	virtual numberobj* operator-(const numberobj&) = 0;
-
-
-	virtual string output() = 0;
-	virtual void input(string) = 0;
-	friend istream& operator>> (istream&, const numberobj*&);
-	friend ostream& operator<< (ostream&, const numberobj*&);
 private:
 
-	string name;
 };
 
-istream& operator>> (istream&, numberobj*&);
-ostream& operator<< (ostream&, numberobj*&);
 #endif /* numberobj_hpp */

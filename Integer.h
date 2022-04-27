@@ -2,7 +2,6 @@
 #define Integer_h
 
 #include "numberobj.h"
-#include "Decimal.h"
 #include <iostream>
 using std::ostream;
 using std::istream;
@@ -15,36 +14,34 @@ using std::string;
 
 class Integer : public numberobj {
 public:
-
+	string m_name;
 	Integer();
-	Integer operator=(Integer&);
-	Integer operator=(Decimal&);
-	Integer operator=(string&);
-
+	Integer(const string&);
+	Integer(const Integer&);
+	Integer operator=(const Integer&);
+	Integer operator=(const string&);
 
 	void CALC_assign(string);
-	numberobj* operator!();
-	numberobj* operator^(const numberobj&);
 
-	numberobj* operator+();
-	numberobj* operator-();
+	Integer operator!();
+	Integer operator^(const Integer&);
 
-	numberobj* operator*(const numberobj&);
-	numberobj* operator/(const numberobj&);
+	Integer operator+();
+	Integer operator-();
 
-	numberobj* operator+(const numberobj&);
-	numberobj* operator-(const numberobj&);
+	Integer operator*(const Integer&);
+	Integer operator/(const Integer&);
 
+	Integer operator+(const Integer&);
+	Integer operator-(const Integer&);
 
-	string output();
-	void input(string);
 	friend istream& operator>> (istream&, Integer&);
 	friend ostream& operator<< (ostream&, Integer&);
 
 private:
-	int m_num_digit; // digit
-	bool m_posti; // postive == 1
-	vector<char> m_num; //
+	int m_digit; 	// digit
+	bool m_posti; 		// postive == 1
+	vector<char> m_val; //
 };
 
 istream& operator>> (istream&, Integer&);

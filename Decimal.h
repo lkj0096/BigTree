@@ -16,31 +16,27 @@ class Decimal : public Integer{
 public:
 
 	Decimal();
-	Integer operator=(Integer&);
-	Integer operator=(Decimal&);
-	Integer operator=(string&);
+	Decimal operator=(Decimal&);
+	Decimal operator=(Integer&);
+	Decimal operator=(string&);
 
 	void CALC_assign(string);
-	numberobj* operator!();
-	numberobj* operator^(const numberobj&);
+	Decimal operator!();
+	Decimal operator^(const Decimal&);
 
-	numberobj* operator+();
-	numberobj* operator-();
+	Decimal operator+();
+	Decimal operator-();
 
-	numberobj* operator*(const numberobj&);
-	numberobj* operator/(const numberobj&);
+	Decimal operator*(const Decimal&);
+	Decimal operator/(const Decimal&);
 
-	numberobj* operator+(const numberobj&);
-	numberobj* operator-(const numberobj&);
+	Decimal operator+(const Decimal&);
+	Decimal operator-(const Decimal&);
 
-
-	string output();
-	void input(string);
 	friend istream& operator>> (istream&, Decimal&);
 	friend ostream& operator<< (ostream&, Decimal&);
 private:
-	int m_den_digit;
-	vector<char> m_den;	//  denumerator
+	Integer denum, num;
 };
 
 istream& operator>> (istream&, Decimal&);

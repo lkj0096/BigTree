@@ -15,5 +15,5 @@ using std::string;
 #include "Decimal.h"
 
 int main(){
-	
+	cout <<"123";
 }
