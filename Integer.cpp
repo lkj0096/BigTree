@@ -17,7 +17,7 @@ Integer::Integer(){
     m_name = "_INT_DEFAULT_CON";
     m_posti = 1;
     m_digit = 0;
-    m_val = "";
+    m_val = "0";
 }
 
  Integer::Integer(const Integer& t_Int){
@@ -52,8 +52,8 @@ Integer::Integer(string t_str){
 Integer Integer::operator=(const Integer t_Int){
     m_name = "_INT_COPY_INT";
 	m_val = t_Int.m_val;
-	m_posti = m_posti;
-	m_digit = m_digit;
+	m_posti = t_Int.m_posti;
+	m_digit = t_Int.m_digit;
     return *this;
 }
 
@@ -87,7 +87,7 @@ istream& operator>> (istream& is, Integer t_Int){
 }
 
 ostream& operator<< (ostream& os, Integer t_Int){
-    os << t_Int.m_val;
+    os << (t_Int.m_posti?"" : "-") << t_Int.m_val;
     return os;
 }
 //----------------------------------------------------------
@@ -96,6 +96,7 @@ bool bigger(string a, string b){
 	else if(a.size()==b.size()){return a>=b;}
 	else{return false;}
 }
+
 Integer Integer::operator!(){
 	Integer T, ans("1");
 	T.m_val = m_val;
@@ -122,12 +123,13 @@ Integer Integer::operator+(){
 	return *this;
 }
 Integer Integer::operator-(){
-	m_posti = false;
+	m_posti = !m_posti;
 	return *this;
 }
 
 Integer Integer::operator*(const Integer ip){
 	string a = m_val, b = ip.m_val;
+	bool sign = m_posti ^ ip.m_posti;
 	Integer ans("0");
 	if (a.size() < b.size()) { swap(a, b); }
 	Integer curr(a);
@@ -141,100 +143,144 @@ Integer Integer::operator*(const Integer ip){
 		//cout << ans << endl;
 		curr.m_val+='0';
 	}
+	ans.m_posti = !sign;
 	return ans;
 }
 
 Integer Integer::operator/(const Integer ip){
 	Integer aa = (*this), bb = ip;
+	bool sign = m_posti ^ ip.m_posti;
 	string a = m_val, b = ip.m_val;
 	if(!bigger(a, b)){
 		return Integer("0");
 	}
 	Integer cnt("0");
-	while(bigger(aa.m_val, bb.m_val)){
-		cnt = cnt+Integer("1");
-		aa = aa-bb;
+	string bb_orgval = bb.m_val;
+	int length_diff = aa.m_val.length() - bb.m_val.length();
+	while (length_diff > -1) {
+		bb.m_val = bb_orgval + string(length_diff--, '0');
+		cnt = cnt * Integer("10");
+		while (bigger(aa.m_val, bb.m_val)) {
+			cnt = cnt + Integer("1");
+			aa = aa - bb;
+		}
 	}
+	cnt.m_posti = !sign;
 	return cnt;
 }
 
 Integer Integer::operator+(const Integer ip){
-  string ans, a, b;
-	a = m_val;
-	b = ip.m_val;
-	reverse(a.begin(), a.end());
-	reverse(b.begin(), b.end());
-	bool have_c = false;
-	int c;
-	int SZ = max(a.size(), b.size());
-	for(int i = 0; i<SZ; ++i){
-		if(i>=a.size()){
-			int v = have_c?c+b[i]-'0':b[i]-'0';
-			if(v>=10){
-				c = v/10;
-				have_c = 1;
-				v%=10;
+	Integer R(*this), L(ip); 
+	if (m_posti && ip.m_posti) {
+		string ans, a, b;
+		a = m_val;
+		b = ip.m_val;
+		reverse(a.begin(), a.end());
+		reverse(b.begin(), b.end());
+		bool have_c = false;
+		int c;
+		int SZ = max(a.size(), b.size());
+		for (int i = 0; i < SZ; ++i) {
+			if (i >= a.size()) {
+				int v = have_c ? c + b[i] - '0' : b[i] - '0';
+				if (v >= 10) {
+					c = v / 10;
+					have_c = 1;
+					v %= 10;
+				}
+				else { have_c = 0; }
+				ans.push_back(v + '0');
 			}
-			else{have_c = 0;}
-			ans.push_back(v+'0');
-		}
-		else if(i>=b.size()){
-			int v = have_c?c+a[i]-'0':a[i]-'0';
-			if(v>=10){
-				c = v/10;
-				have_c = 1;
-				v%=10;
+			else if (i >= b.size()) {
+				int v = have_c ? c + a[i] - '0' : a[i] - '0';
+				if (v >= 10) {
+					c = v / 10;
+					have_c = 1;
+					v %= 10;
+				}
+				else { have_c = 0; }
+				ans.push_back(v + '0');
 			}
-			else{have_c = 0;}
-			ans.push_back(v+'0');
-		}
-		else{
-			int v = have_c?c+a[i]+b[i]-'0'-'0':a[i]+b[i]-'0'-'0';
-			if(v>=10){
-				c = v/10;
-				have_c = 1;
-				v%=10;
+			else {
+				int v = have_c ? c + a[i] + b[i] - '0' - '0' : a[i] + b[i] - '0' - '0';
+				if (v >= 10) {
+					c = v / 10;
+					have_c = 1;
+					v %= 10;
+				}
+				else { have_c = 0; }
+				ans.push_back(v + '0');
 			}
-			else{have_c = 0;}
-			ans.push_back(v+'0');
 		}
+		if (have_c) {
+			ans.push_back(c + '0');
+		}
+		reverse(ans.begin(), ans.end());
+		return Integer(ans);
 	}
-	if(have_c){
-		ans.push_back(c+'0');
+	else if (m_posti == 0 && ip.m_posti) {
+		return -(-R-L);
 	}
-	reverse(ans.begin(), ans.end());
-	return Integer(ans);
+	else if (m_posti && ip.m_posti == 0) {
+		return (R-(-L));
+	}
+	else if (m_posti == 0 && ip.m_posti == 0) {
+		return -((-R)+(-L));
+	}
+	
 }
 Integer Integer::operator-(const Integer ip){
-	string a = m_val, b = ip.m_val, ans;
-	bool neg = 0;
-	Integer ret;
-	if(bigger(a, b)){}
-	else{
-		swap(a, b);
-		neg = 1;
+	Integer R(*this), L(ip);
+	if (m_posti && ip.m_posti) {
+		string a = m_val, b = ip.m_val, ans;
+		bool neg = 0;
+		Integer ret;
+		if (bigger(a, b)) {}
+		else {
+			swap(a, b);
+			neg = 1;
+		}
+		reverse(a.begin(), a.end());
+		reverse(b.begin(), b.end());
+		int SZ = a.size();
+		for (int i = 0; i < SZ; ++i) {
+			if (i >= b.size()) {
+				ans.push_back(a[i]);
+			}
+			else if (a[i] < b[i]) {
+				int j = i + 1;
+				while (a[j] == '0') { a[j] = '9'; j++; }
+				a[j]--;
+				int v = a[i] - '0' + 10 - b[i] + '0';
+				ans.push_back(v + '0');
+			}
+			else {
+				ans.push_back(a[i] - b[i] + '0');
+			}
+		}
+		reverse(ans.begin(), ans.end());
+		while (ans.size() && *ans.begin() == '0') { ans.erase(ans.begin()); }
+		if (neg) { m_posti = false; }
+		ret.m_val = ans;
+		return ret;
 	}
-	reverse(a.begin(), a.end());
-	reverse(b.begin(), b.end());
-	int SZ = a.size();
-	for(int i = 0; i<SZ; ++i){
-			if(i>=b.size()){
-					ans.push_back(a[i]);
-			}
-			else if(a[i]<b[i]){
-					int j = i+1;
-					while(a[j]=='0'){a[j] = '9';j++;}
-					a[j]--;
-					int v = a[i]-'0'+10-b[i]+'0';
-					ans.push_back(v+'0');
-			}
-			else{
-					ans.push_back(a[i]-b[i]+'0');
-			}
+	else if (m_posti == 0 && ip.m_posti) {
+		Integer v =  -R+L;
+		v.m_posti = 0;
+		return v;;
 	}
-	reverse(ans.begin(), ans.end());
-	while(ans.size()&&*ans.begin()=='0'){ans.erase(ans.begin());}
-	if(neg){m_posti = false;}
-	ret.m_val = ans;
-	return ret;
+	else if (m_posti && ip.m_posti == 0) {
+		Integer v = R + (-L);
+		v.m_posti = 1;
+		return v;
+	}
+	else if (m_posti == 0 && ip.m_posti == 0) {
+		return (-L) - (-R);
+	}
+}
+
+
+Integer Integer::MODMODMOD(const Integer ip) {
+	Integer R(*this), L(ip);
+	return Integer(R - ((R / L) * L));
 }

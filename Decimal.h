@@ -22,7 +22,7 @@ public:
 	Decimal operator=(Decimal);
 	Decimal operator=(Integer);
 	Decimal operator=(string);
-
+	Decimal(const Integer, const Integer);
 	void CALC_assign(string);
 
 	Decimal operator!();
@@ -47,10 +47,16 @@ public:
 	Decimal operator-(const Integer);
 	friend Decimal operator-( const Integer, const Decimal);
 
-	friend istream& operator>> (istream&, Decimal);
+	friend istream& operator>> (istream&, Decimal&);
 	friend ostream& operator<< (ostream&, Decimal);
-private:
+	void cout_nnnn() {
+		std::cout << "\n---------------------------------\n";
+		std::cout << "  num : " << (m_num.m_posti == 1 ? "" : "-") << m_num.m_val << std::endl;
+		std::cout << "denum : " << (m_denum.m_posti == 1 ? "" : "-") << m_denum.m_val << std::endl;
+		std::cout << "\n---------------------------------\n";
+	}
 	Integer m_denum, m_num;
+	
 };
 
 istream& operator>> (istream&, Decimal);

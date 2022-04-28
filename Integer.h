@@ -34,13 +34,15 @@ public:
 
 	Integer operator+(const Integer);
 	Integer operator-(const Integer);
+	
+	Integer MODMODMOD(const Integer);
 
 	friend istream& operator>> (istream&, Integer);
 	friend ostream& operator<< (ostream&, Integer);
-
-private:
-	int m_digit; 	// digit
 	bool m_posti; 		// postive == 1
+
+	int m_digit; 	// digit
+	
 	string  m_val; //
 };
 
