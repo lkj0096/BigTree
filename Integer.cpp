@@ -2,7 +2,6 @@
 #include <iostream>
 using std::ostream;
 using std::istream;
-using namespace std;
 using std::max;
 #include <vector>
 using std::vector;
@@ -26,9 +25,36 @@ Integer::Integer(){
      m_digit = t_Int.m_digit;
      m_val = t_Int.m_val;
  }
+
 Integer::Integer(string t_str){
     m_name = "_INT_CON_STR";
+#ifdef CALC_h
+	calc XXX(*this, t_str);
+#else
+	this->CALC_assign(t_str);
+#endif // CALC_h
+}
 
+Integer Integer::operator=(const Integer t_Int){
+    m_name = "_INT_COPY_INT";
+	m_val = t_Int.m_val;
+	m_posti = t_Int.m_posti;
+	m_digit = t_Int.m_digit;
+    return *this;
+}
+
+Integer Integer::operator=(const string& t_str){
+	m_name = "_INT_COPY_STR";
+#ifdef CALC_h
+	calc XXX(*this, t_str);
+#else 
+	this->CALC_assign(t_str);
+#endif // CALC_h
+    return *this;
+}
+
+void Integer::CALC_assign(string t_str){
+    m_name = "_INT_CALC_ASSIGN";
     if(m_val.find('.') != string::npos){
         m_val = string(m_val, 0, m_val.find('.'));
     }
@@ -45,44 +71,16 @@ Integer::Integer(string t_str){
 		if (j == '0')i++;
 		else break;
 	}
-	m_val = m_val.substr(i);
-    // calc XXX(*this, t_str);
 }
 
-Integer Integer::operator=(const Integer t_Int){
-    m_name = "_INT_COPY_INT";
-	m_val = t_Int.m_val;
-	m_posti = t_Int.m_posti;
-	m_digit = t_Int.m_digit;
-    return *this;
-}
-
-Integer Integer::operator=(const string& t_str){
-    Integer newInt;
-    newInt.m_name = "_INT_COPY_STR";
-    // calc XXX(newInt, t_str);
-    return newInt;
-}
-
-void Integer::CALC_assign(string t_str){
-    m_name = "_INT_CALC_ASSIGN";
-    if(m_val.find('.') != string::npos){
-        m_val = string(m_val, 0, m_val.find('.'));
-    }
-    if(t_str[0] == '-'){
-        m_val = string(t_str, 1);
-        m_posti = 0;
-    }
-    else{
-        m_val = string(t_str);
-        m_posti = 1;
-    }
-}
-
-istream& operator>> (istream& is, Integer t_Int){
+istream& operator>> (istream& is, Integer& t_Int){
     string str;
     is >> str;
-    // calc XXX(newInt, str);
+#ifdef CALC_h
+	calc XXX(t_Int, t_str);
+#else 
+	t_Int.CALC_assign(str);
+#endif // CALC_h
     return is;
 }
 
@@ -108,7 +106,7 @@ Integer Integer::operator!(){
 }
 Integer Integer::operator^(const Integer ip){
 	Integer ans("1");
-	Integer b = (*this);
+	Integer b(*this);
 	Integer p(ip);
 	while(p.m_val!=""){
 		ans = ans*b;
@@ -128,7 +126,7 @@ Integer Integer::operator-(){
 }
 
 Integer Integer::operator*(const Integer ip){
-	string a = m_val, b = ip.m_val;
+	string a(m_val), b(ip.m_val);
 	bool sign = m_posti ^ ip.m_posti;
 	Integer ans("0");
 	if (a.size() < b.size()) { swap(a, b); }
@@ -148,7 +146,7 @@ Integer Integer::operator*(const Integer ip){
 }
 
 Integer Integer::operator/(const Integer ip){
-	Integer aa = (*this), bb = ip;
+	Integer aa(*this), bb(ip);
 	bool sign = m_posti ^ ip.m_posti;
 	string a = m_val, b = ip.m_val;
 	if(!bigger(a, b)){
@@ -267,7 +265,7 @@ Integer Integer::operator-(const Integer ip){
 	else if (m_posti == 0 && ip.m_posti) {
 		Integer v =  -R+L;
 		v.m_posti = 0;
-		return v;;
+		return v;
 	}
 	else if (m_posti && ip.m_posti == 0) {
 		Integer v = R + (-L);
@@ -277,10 +275,4 @@ Integer Integer::operator-(const Integer ip){
 	else if (m_posti == 0 && ip.m_posti == 0) {
 		return (-L) - (-R);
 	}
-}
-
-
-Integer Integer::MODMODMOD(const Integer ip) {
-	Integer R(*this), L(ip);
-	return Integer(R - ((R / L) * L));
 }
