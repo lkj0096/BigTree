@@ -28,7 +28,7 @@ Integer::Integer(){
 
 Integer::Integer(string t_str){
     m_name = "_INT_CON_STR";
-#ifdef CALC_h
+#ifdef Calculator_hpp
 	calc XXX(*this, t_str);
 #else
 	this->CALC_assign(t_str);
@@ -45,7 +45,7 @@ Integer Integer::operator=(const Integer t_Int){
 
 Integer Integer::operator=(const string& t_str){
 	m_name = "_INT_COPY_STR";
-#ifdef CALC_h
+#ifdef Calculator_hpp
 	calc XXX(*this, t_str);
 #else 
 	this->CALC_assign(t_str);
@@ -55,8 +55,8 @@ Integer Integer::operator=(const string& t_str){
 
 void Integer::CALC_assign(string t_str){
     m_name = "_INT_CALC_ASSIGN";
-    if(m_val.find('.') != string::npos){
-        m_val = string(m_val, 0, m_val.find('.'));
+    if(t_str.find('.') != string::npos){
+		t_str = t_str.substr(0, t_str.find('.'));
     }
     if(t_str[0] == '-'){
         m_val = string(t_str, 1);
@@ -76,7 +76,7 @@ void Integer::CALC_assign(string t_str){
 istream& operator>> (istream& is, Integer& t_Int){
     string str;
     is >> str;
-#ifdef CALC_h
+#ifdef Calculator_hpp
 	calc XXX(t_Int, t_str);
 #else 
 	t_Int.CALC_assign(str);

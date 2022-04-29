@@ -21,9 +21,7 @@ using std::string;
 
 class numberobj{
 public:
-
-private:
-
+	
 };
 
 #endif /* numberobj_hpp */

@@ -26,6 +26,8 @@ Decimal::Decimal(const Integer t_num, const Integer t_denum) : Integer{} {
 	m_name = "_DEC_CON_INT_INT";
 	m_num = t_num;
 	m_denum = t_denum;
+	m_num.m_posti = m_denum.m_posti ^ m_num.m_posti;
+	m_denum.m_posti = 1;
 }
 
 Decimal::Decimal(const Integer t_Int) : Integer{} {
@@ -37,7 +39,7 @@ Decimal::Decimal(const Integer t_Int) : Integer{} {
 
 Decimal::Decimal(const string t_str) : Integer{} {
 	m_name = "_DEC_CON_DEC";
-#ifdef CALC_h
+#ifdef Calculator_hpp
 	calc XXX(*this, t_str);
 #else
 	m_num = Integer();
@@ -65,7 +67,7 @@ Decimal Decimal::operator=(Integer t_Int) {
 }
 Decimal Decimal::operator=(string t_str) {
 	m_name = "_DEC_ASS_STR";
-#ifdef CALC_h
+#ifdef Calculator_hpp
 	 calc XXX(*this, t_str);
 #else 
 	this->CALC_assign(t_str);
@@ -83,18 +85,13 @@ void Decimal::CALC_assign(string t_str) {
 	else {
 		cnt = t_str.length();
 	}
-	//de = "1" + string(t_str.length() - cnt - 1,'0');
-
-	//if (t_str[0] == '-') {
-	//	t_str.erase(t_str.begin());
-	//}
 
 	m_num = Integer(t_str);
 	m_denum.CALC_assign(string("1" + string(t_str.length() - cnt, '0')));
 }
 
 Decimal Decimal::operator!() {
-#ifdef Calc_h
+#ifdef Calculator_hpp
 	throw "!!!! Can't use Factorial Decimal !!!!";
 
 #else
@@ -106,7 +103,7 @@ Decimal Decimal::operator!() {
 istream& operator>> (istream& is, Decimal& t_Dec) {
 	string str;
 	is >> str;
-#ifdef CALC_h
+#ifdef Calculator_hpp
 	calc XXX(t_Dec, str);
 #else
 	t_Dec.CALC_assign(str);
@@ -198,21 +195,32 @@ Decimal operator*( const Integer a, const Decimal b){
 	return ans;
 }
 Decimal Decimal::operator/(const Decimal ip){
-	Decimal v(ip);
-	swap(v.m_denum, v.m_num);
+	Decimal v(ip.m_denum, ip.m_num);
+	v.m_num.m_posti = v.m_denum.m_posti ^ v.m_num.m_posti;
+	v.m_denum.m_posti = v.m_denum.m_posti ^ v.m_num.m_posti;
+	v.m_num.m_posti = v.m_denum.m_posti ^ v.m_num.m_posti;
 	Decimal ans((*this) * v);
 	return ans;
 }
 Decimal Decimal::operator/(const Integer ip){
 	Decimal ans(*(this));
-	ans.m_denum = ans.m_denum * ip;
+	Integer v(ip);
+	if (v.m_posti == 0) {
+		v.m_posti = 1;
+		ans.m_num.m_posti = 0;
+	}
+	else {
+		ans.m_num.m_posti = 1;
+	}
+	ans.m_denum = ans.m_denum * v;
 	return ans;
 }
 Decimal operator/( const Integer a, const Decimal b){
-	Decimal v(b);
-	swap(v.m_num, v.m_denum);
-	v = v.m_num* a;
-	return v;
+	//std::cout << b;
+	Decimal v(b.m_denum, b.m_num);
+	
+	v = v * Decimal(a);
+	return b;
 }
 
 Decimal Decimal::operator+(const Decimal ip){
