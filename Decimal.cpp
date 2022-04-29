@@ -100,6 +100,24 @@ Decimal Decimal::operator!() {
 	return *this;
 }
 
+void Decimal::output() {
+	std::cout << ((m_num.m_posti ^ m_denum.m_posti) ? "-" : "");
+	
+	Integer Rv(m_num.m_val + string(100, '0'));
+	
+	Rv = Rv / m_denum;
+	
+	string opt = Rv.m_val;
+	
+	if (opt.length() < 100) {
+		opt = string(100 - opt.length(), '0') + opt;
+	}
+	
+	opt.insert(opt.end() - 100, '.');
+	
+	std::cout << (opt.length() == 101 ? "0" : "") << opt;
+}
+
 istream& operator>> (istream& is, Decimal& t_Dec) {
 	string str;
 	is >> str;

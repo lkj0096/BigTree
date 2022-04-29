@@ -34,9 +34,7 @@ public:
 
 	Integer operator+(const Integer);
 	Integer operator-(const Integer);
-
-	friend istream& operator>> (istream&, Integer&);
-	friend ostream& operator<< (ostream&, Integer);
+	void output();
 	bool m_posti; 		// postive == 1
 
 	int m_digit; 	// digit

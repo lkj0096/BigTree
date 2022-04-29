@@ -72,6 +72,9 @@ void Integer::CALC_assign(string t_str){
 		else break;
 	}
 }
+void Integer::output() {
+	std::cout << (m_posti ? "" : "-") << m_val;
+}
 
 istream& operator>> (istream& is, Integer& t_Int){
     string str;
@@ -147,14 +150,17 @@ Integer Integer::operator*(const Integer ip){
 
 Integer Integer::operator/(const Integer ip){
 	Integer aa(*this), bb(ip);
-	bool sign = m_posti ^ ip.m_posti;
-	string a = m_val, b = ip.m_val;
-	if(!bigger(a, b)){
+	bool sign = aa.m_posti ^ bb.m_posti;
+	aa.m_posti = 1;
+	bb.m_posti = 1;
+	if(!bigger(aa.m_val, bb.m_val)){
 		return Integer("0");
 	}
+
 	Integer cnt("0");
 	string bb_orgval = bb.m_val;
 	int length_diff = aa.m_val.length() - bb.m_val.length();
+	
 	while (length_diff > -1) {
 		bb.m_val = bb_orgval + string(length_diff--, '0');
 		cnt = cnt * Integer("10");
@@ -163,7 +169,9 @@ Integer Integer::operator/(const Integer ip){
 			aa = aa - bb;
 		}
 	}
+	
 	cnt.m_posti = !sign;
+
 	return cnt;
 }
 
