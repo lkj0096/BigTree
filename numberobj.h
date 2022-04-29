@@ -21,7 +21,10 @@ using std::string;
 
 class numberobj{
 public:
+	virtual void output();
+
 	
 };
+ostream& operator<<(ostream& os, numberobj* ptr);
 
 #endif /* numberobj_hpp */

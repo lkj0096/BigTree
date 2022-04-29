@@ -1,5 +1,6 @@
 #include "Integer.h"
 #include <iostream>
+using namespace std;
 using std::ostream;
 using std::istream;
 using std::max;
@@ -72,22 +73,24 @@ void Integer::CALC_assign(string t_str){
 		else break;
 	}
 }
-
-istream& operator>> (istream& is, Integer& t_Int){
-    string str;
-    is >> str;
-#ifdef Calculator_hpp
-	calc XXX(t_Int, t_str);
-#else 
-	t_Int.CALC_assign(str);
-#endif // CALC_h
-    return is;
+void Integer::output() {
+	cout << "Hello Integer" << endl;
 }
-
-ostream& operator<< (ostream& os, Integer t_Int){
-    os << (t_Int.m_posti?"" : "-") << t_Int.m_val;
-    return os;
-}
+//istream& operator>> (istream& is, Integer& t_Int){
+//    string str;
+//    is >> str;
+//#ifdef Calculator_hpp
+//	calc XXX(t_Int, t_str);
+//#else 
+//	t_Int.CALC_assign(str);
+//#endif // CALC_h
+//    return is;
+//}
+//
+//ostream& operator<< (ostream& os, Integer t_Int){
+//    os << (t_Int.m_posti?"" : "-") << t_Int.m_val;
+//    return os;
+//}
 //----------------------------------------------------------
 bool bigger(string a, string b){
 	if(a.size()>b.size()){return true;}

@@ -1,5 +1,6 @@
 #include "Decimal.h"
 #include <iostream>
+using namespace std;
 using std::ostream;
 using std::istream;
 
@@ -100,36 +101,39 @@ Decimal Decimal::operator!() {
 	return *this;
 }
 
-istream& operator>> (istream& is, Decimal& t_Dec) {
-	string str;
-	is >> str;
-#ifdef Calculator_hpp
-	calc XXX(t_Dec, str);
-#else
-	t_Dec.CALC_assign(str);
-#endif // CALC_h
-	return is;
+void Decimal::output() {
+	cout << "Hello Decimal" << endl;
 }
-
-ostream& operator<< (ostream& os, Decimal t_Dec) {
-	os << ((t_Dec.m_num.m_posti ^ t_Dec.m_denum.m_posti) ? "-" : "");
-	
-	Integer Rv(t_Dec.m_num.m_val + string(100, '0'));
-	
-	Rv = Rv / t_Dec.m_denum;
-	
-	string opt = Rv.m_val;
-	
-	if (opt.length() < 100) {
-		opt = string(100 - opt.length(), '0') + opt;
-	}
-	
-	opt.insert(opt.end() - 100, '.');
-	
-	os << (opt.length() == 101 ? "0" : "") << opt;
-	
-	return os;
-}
+//istream& operator>> (istream& is, Decimal& t_Dec) {
+//	string str;
+//	is >> str;
+//#ifdef Calculator_hpp
+//	calc XXX(t_Dec, str);
+//#else
+//	t_Dec.CALC_assign(str);
+//#endif // CALC_h
+//	return is;
+//}
+//
+//ostream& operator<< (ostream& os, Decimal t_Dec) {
+//	os << ((t_Dec.m_num.m_posti ^ t_Dec.m_denum.m_posti) ? "-" : "");
+//	
+//	Integer Rv(t_Dec.m_num.m_val + string(100, '0'));
+//	
+//	Rv = Rv / t_Dec.m_denum;
+//	
+//	string opt = Rv.m_val;
+//	
+//	if (opt.length() < 100) {
+//		opt = string(100 - opt.length(), '0') + opt;
+//	}
+//	
+//	opt.insert(opt.end() - 100, '.');
+//	
+//	os << (opt.length() == 101 ? "0" : "") << opt;
+//	
+//	return os;
+//}
 //---------------------------------------------
 
 //bool bigger(Decimal a, Decimal b) { //a>b

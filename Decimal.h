@@ -47,8 +47,8 @@ public:
 	Decimal operator-(const Integer);
 	friend Decimal operator-( const Integer, const Decimal);
 
-	friend istream& operator>> (istream&, Decimal&);
-	friend ostream& operator<< (ostream&, Decimal);
+	//friend istream& operator>> (istream&, Decimal&);
+	//friend ostream& operator<< (ostream&, Decimal);
 	
 	void cout_nnnn() {
 		std::cout << "\n---------------------------------\n";
@@ -56,13 +56,13 @@ public:
 		std::cout << "denum : " << (m_denum.m_posti == 1 ? "" : "-") << m_denum.m_val << std::endl;
 		std::cout << "\n---------------------------------\n";
 	}
-	
+	void output();
 	Integer m_denum, m_num;
 	
 };
 
-istream& operator>> (istream&, Decimal&);
-ostream& operator<< (ostream&, Decimal);
+//istream& operator>> (istream&, Decimal&);
+//ostream& operator<< (ostream&, Decimal);
 
 Decimal operator^( const Integer, const Decimal);
 Decimal operator*( const Integer, const Decimal);
