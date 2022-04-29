@@ -46,9 +46,6 @@ public:
 	Decimal operator-(const Decimal);
 	Decimal operator-(const Integer);
 	friend Decimal operator-( const Integer, const Decimal);
-
-	//friend istream& operator>> (istream&, Decimal&);
-	//friend ostream& operator<< (ostream&, Decimal);
 	
 	void cout_nnnn() {
 		std::cout << "\n---------------------------------\n";
@@ -61,8 +58,8 @@ public:
 	
 };
 
-//istream& operator>> (istream&, Decimal&);
-//ostream& operator<< (ostream&, Decimal);
+istream& operator>> (istream&, Decimal&);
+ostream& operator<< (ostream&, Decimal);
 
 Decimal operator^( const Integer, const Decimal);
 Decimal operator*( const Integer, const Decimal);
