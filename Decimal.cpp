@@ -81,7 +81,7 @@ void Decimal::CALC_assign(string t_str) {
 		t_str.erase(t_str.begin() + cnt);
 	}
 	else {
-		cnt = t_str.length() + 1;
+		cnt = t_str.length();
 	}
 	//de = "1" + string(t_str.length() - cnt - 1,'0');
 
