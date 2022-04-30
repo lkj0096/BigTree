@@ -1,6 +1,7 @@
 #ifndef Decimal_h
 #define Decimal_h
 
+#include "Calculator.hpp"
 #include "Integer.h"
 #include <iostream>
 using std::ostream;
@@ -53,9 +54,12 @@ public:
 		std::cout << "denum : " << (m_denum.m_posti == 1 ? "" : "-") << m_denum.m_val << std::endl;
 		std::cout << "\n---------------------------------\n";
 	}
-	void output();
-	Integer m_denum, m_num;
+
+	string output();
+	void input(string);
 	
+	Integer m_denum, m_num;
+
 };
 
 istream& operator>> (istream&, Decimal&);

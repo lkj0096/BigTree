@@ -21,10 +21,10 @@ using std::string;
 
 class numberobj{
 public:
-	virtual void output();
-
-	
+	virtual string output();
+	virtual void input(string);
 };
 ostream& operator<<(ostream& os, numberobj* ptr);
+istream& operator>>(istream& is, numberobj* ptr);
 
 #endif /* numberobj_hpp */

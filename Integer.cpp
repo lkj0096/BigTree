@@ -29,7 +29,7 @@ Integer::Integer(){
 Integer::Integer(string t_str){
     m_name = "_INT_CON_STR";
 #ifdef Calculator_hpp
-	calc XXX(*this, t_str);
+	NumberConstruct(*this, t_str);
 #else
 	this->CALC_assign(t_str);
 #endif // CALC_h
@@ -46,7 +46,7 @@ Integer Integer::operator=(const Integer t_Int){
 Integer Integer::operator=(const string& t_str){
 	m_name = "_INT_COPY_STR";
 #ifdef Calculator_hpp
-	calc XXX(*this, t_str);
+	NumberConstruct(*this, t_str);
 #else 
 	this->CALC_assign(t_str);
 #endif // CALC_h
@@ -72,15 +72,12 @@ void Integer::CALC_assign(string t_str){
 		else break;
 	}
 }
-void Integer::output() {
-	std::cout << (m_posti ? "" : "-") << m_val;
-}
 
 istream& operator>> (istream& is, Integer& t_Int){
     string str;
     is >> str;
 #ifdef Calculator_hpp
-	calc XXX(t_Int, t_str);
+	NumberConstruct(*this, str);
 #else 
 	t_Int.CALC_assign(str);
 #endif // CALC_h
@@ -91,6 +88,21 @@ ostream& operator<< (ostream& os, Integer t_Int){
     os << (t_Int.m_posti?"" : "-") << t_Int.m_val;
     return os;
 }
+
+
+void Integer::input(string& str){
+#ifdef Calculator_hpp
+	NumberConstruct(*this, str);
+#else 
+	t_Int.CALC_assign(str);
+#endif // CALC_h
+}
+
+string Integer::output() {
+	return (t_Int.m_posti?"" : "-") + t_Int.m_val;
+}
+
+
 //----------------------------------------------------------
 bool bigger(string a, string b){
 	if(a.size()>b.size()){return true;}

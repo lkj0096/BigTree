@@ -1,6 +1,7 @@
 #ifndef Integer_h
 #define Integer_h
 
+#include "Calculator.hpp"
 #include "numberobj.h"
 #include <iostream>
 using std::ostream;
@@ -34,11 +35,12 @@ public:
 
 	Integer operator+(const Integer);
 	Integer operator-(const Integer);
-	void output();
+	
+	void input(string);
+	string output();
+
 	bool m_posti; 		// postive == 1
 
-	int m_digit; 	// digit
-	
 	string  m_val; //
 };
 

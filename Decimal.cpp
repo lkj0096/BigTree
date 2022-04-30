@@ -40,7 +40,7 @@ Decimal::Decimal(const Integer t_Int) : Integer{} {
 Decimal::Decimal(const string t_str) : Integer{} {
 	m_name = "_DEC_CON_DEC";
 #ifdef Calculator_hpp
-	calc XXX(*this, t_str);
+	NumberConstruct(*this, str);
 #else
 	m_num = Integer();
 	m_num.CALC_assign("1");
@@ -68,7 +68,7 @@ Decimal Decimal::operator=(Integer t_Int) {
 Decimal Decimal::operator=(string t_str) {
 	m_name = "_DEC_ASS_STR";
 #ifdef Calculator_hpp
-	 calc XXX(*this, t_str);
+	 NumberConstruct(*this, str);
 #else 
 	this->CALC_assign(t_str);
 #endif // CALC_h
@@ -122,7 +122,7 @@ istream& operator>> (istream& is, Decimal& t_Dec) {
 	string str;
 	is >> str;
 #ifdef Calculator_hpp
-	calc XXX(t_Dec, str);
+	NumberConstruct(*this, str);
 #else
 	t_Dec.CALC_assign(str);
 #endif // CALC_h
@@ -147,6 +147,34 @@ ostream& operator<< (ostream& os, Decimal t_Dec) {
 	os << (opt.length() == 101 ? "0" : "") << opt;
 	
 	return os;
+}
+
+string Decimal::input(string& str){
+	#ifdef Calculator_hpp
+	NumberConstruct(*this, str);
+#else
+	t_Dec.CALC_assign(str);
+#endif // CALC_h
+}
+
+string Decimal::output(){
+	string opt = ((t_Dec.m_num.m_posti ^ t_Dec.m_denum.m_posti) ? "-" : "");
+	
+	Integer Rv(t_Dec.m_num.m_val + string(100, '0'));
+	
+	Rv = Rv / t_Dec.m_denum;
+	
+	opt += Rv.m_val;
+	
+	if (opt.length() < 100) {
+		opt += string(100 - opt.length(), '0') + opt;
+	}
+	
+	opt.insert(opt.end() - 100, '.');
+	
+	opt = (opt.length() == 101 ? "0" : "") + opt;
+	
+	return opt;
 }
 //---------------------------------------------
 
