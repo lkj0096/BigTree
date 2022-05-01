@@ -55,6 +55,8 @@ public:
 		std::cout << "\n---------------------------------\n";
 	}
 
+	bool isInteger(){return 0;};
+
 	string output();
 	void input(string);
 	

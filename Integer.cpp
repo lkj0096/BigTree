@@ -1,4 +1,4 @@
-#include "Integer.h"
+has #include "Integer.h"
 #include <iostream>
 using std::ostream;
 using std::istream;
@@ -15,21 +15,24 @@ using std::reverse;
 Integer::Integer(){
     m_name = "_INT_DEFAULT_CON";
     m_posti = 1;
-    m_digit = 0;
     m_val = "0";
 }
 
  Integer::Integer(const Integer& t_Int){
      m_name = "_INT_CON_INT";
      m_posti = t_Int.m_posti;
-     m_digit = t_Int.m_digit;
      m_val = t_Int.m_val;
  }
 
 Integer::Integer(string t_str){
     m_name = "_INT_CON_STR";
 #ifdef Calculator_hpp
-	NumberConstruct(*this, t_str);
+	try{
+		NumberConstruct(*this, t_str);
+	}
+	catch(const char* s){
+		throw s;
+	}
 #else
 	this->CALC_assign(t_str);
 #endif // CALC_h
@@ -39,14 +42,18 @@ Integer Integer::operator=(const Integer t_Int){
     m_name = "_INT_COPY_INT";
 	m_val = t_Int.m_val;
 	m_posti = t_Int.m_posti;
-	m_digit = t_Int.m_digit;
     return *this;
 }
 
 Integer Integer::operator=(const string& t_str){
 	m_name = "_INT_COPY_STR";
 #ifdef Calculator_hpp
-	NumberConstruct(*this, t_str);
+	try{
+		NumberConstruct(*this, t_str);
+	}
+	catch(const char* s){
+		throw s;
+	}
 #else 
 	this->CALC_assign(t_str);
 #endif // CALC_h
@@ -77,7 +84,12 @@ istream& operator>> (istream& is, Integer& t_Int){
     string str;
     is >> str;
 #ifdef Calculator_hpp
-	NumberConstruct(*this, str);
+	try{
+		NumberConstruct(*this, str);
+	}
+	catch(const char* s){
+		throw s;
+	}
 #else 
 	t_Int.CALC_assign(str);
 #endif // CALC_h
@@ -94,12 +106,12 @@ void Integer::input(string& str){
 #ifdef Calculator_hpp
 	NumberConstruct(*this, str);
 #else 
-	t_Int.CALC_assign(str);
+	CALC_assign(str);
 #endif // CALC_h
 }
 
 string Integer::output() {
-	return (t_Int.m_posti?"" : "-") + t_Int.m_val;
+	return (m_posti?"" : "-") + m_val;
 }
 
 
@@ -120,6 +132,15 @@ Integer Integer::operator!(){
 	return ans;
 }
 Integer Integer::operator^(const Integer ip){
+	if(ip.m_val == "0"){
+		if(this->m_val == "0"){
+			throw "!!!! 0^0 has not defined !!!!";
+		}else{
+			Integer ans();
+			ans.CALC_assign("1");
+			return ans;
+		}
+	}
 	Integer ans("1");
 	Integer b(*this);
 	Integer p(ip);
@@ -161,6 +182,9 @@ Integer Integer::operator*(const Integer ip){
 }
 
 Integer Integer::operator/(const Integer ip){
+	if(ip.m_val == "0"){
+		throw "!!!! divided by 0 !!!!";
+	}
 	Integer aa(*this), bb(ip);
 	bool sign = aa.m_posti ^ bb.m_posti;
 	aa.m_posti = 1;

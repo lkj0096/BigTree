@@ -21,6 +21,7 @@ using std::string;
 
 class numberobj{
 public:
+	virtual bool isInteger();
 	virtual string output();
 	virtual void input(string);
 };

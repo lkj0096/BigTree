@@ -5,7 +5,10 @@
 //  Created by 林士傑 on 2022/4/27.
 //
 
-#include "Calculator.hpp"
+#include "numberobj.h"
+#include "Integer.h"
+#include "Decimal.h"
+#include "Calculator.h"
 
 #include <iostream>
 #include <regex>
@@ -21,9 +24,17 @@ CalcuObj::CalcuObj(bool b, std::string s){
 
 bool Memoryer::setNumberObj(std::string cmd){
     cmd = regex_replace(cmd, regex(" +"), " ");
+
     std::smatch sm;
-    bool match = regex_search(cmd, sm, regex("^([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+) ?$"));
+    bool match = regex_search(cmd, sm, regex("^([^=]+)=([^=]+)$"));
     if(!match) return false;
+    string expression = sm[2];
+    cmd = sm[1];
+
+    bool match = regex_search(cmd, sm, regex("^([^ ]+) ([^ ]+) ([^ ]+) ?$"));
+    if(!match) return false;
+
+    ///Set Integer name "=" expression
     
     //action
     match &= regex_match(sm[1].str(), regex("^[Ss][Ee][Tt]$"));
@@ -32,24 +43,29 @@ bool Memoryer::setNumberObj(std::string cmd){
     bool isInteger = regex_match(sm[2].str(), regex("^[Ii][Nn][Tt][Ee][Gg][Ee][Rr]$"));
     bool isDecimal = regex_match(sm[2].str(), regex("^[Dd][Ee][Cc][Ee][Mm][Aa][Ll]$"));
     match &= ( isInteger || isDecimal );
-    
+
+    ///NameCheck
     //name
     match &= !regex_search(sm[3].str(), regex("[\\(\\)\\!\\^\\+\\-\\*\\/]"));
-    
+
+    ///Expression
     //value
-    match &= regex_match(sm[4].str(), regex("^[-+]?\\d+\\.?\\d*$"));
+    // match &= regex_match(sm[4].str(), regex("^[-+]?\\d+\\.?\\d*$"));
     
     if(!match){
         return false;
     }
     
-    ///type add var
-    
-//    if(isInteger){
-//        numbers[sm[3]] =
-//    }else{
-//        numbers[sm[3]] =
-//    }
+    //type add var
+    try{
+       if(isInteger){
+           numbers[sm[3]] = Integer(expression);
+       }else{
+           numbers[sm[3]] = Decimal(expression);
+       }
+    }catch(const char* s){
+        cout << s << endl;
+    }
     
     return true;
 }
@@ -80,8 +96,11 @@ void Calculator::PreCalculate(std::string input) {
     
     //[num-num] -> [num+-num]
     input = regex_replace(input, regex("([^\\(\\)\\!\\^\\+\\-\\*\\/])-"), "$1+-");
-    
-    suffixToPrefix(input);
+    try{
+        suffixToPrefix(input);
+    }catch(const char* s){
+        throw s;
+    }
 }
 
 std::string Calculator::suffixToPrefix(std::string input) {
@@ -92,10 +111,7 @@ std::string Calculator::suffixToPrefix(std::string input) {
             string str = sm[0];
             ComputeStack.push(CalcuObj(false, str));
             input = input.substr(str.size(), input.size() - str.size());
-            
-            ///todo
             continue;
-//            return "";
         }
         char op = input[0];
         input = input.substr(1, input.size() - 1);
@@ -115,13 +131,10 @@ std::string Calculator::suffixToPrefix(std::string input) {
                 SupportStack.push(op);
                 break;
             case '(':
-                //
                 SupportStack.push(op);
-//                input = Calculate("0" + input);
                 break;
             case ')':
                 TakeSupportStack(-1);
-//                return input;
                 break;
             default:
                 throw ("something wrong AT get operator " + to_string(op));
@@ -181,59 +194,254 @@ NumberObj* Calculator::Calculate(){
     while(!ComputeStack.empty()){
         obj = ComputeStack.top();
         if(!obj.isOperator){
-            ///todo
-            //if number -> calc_assign
-            //
-            //else find in memoryer
-            //
+            bool isInteger = regex_match(obj.value, regex("^\\d+$"));
+            bool isDecimal = regex_match(obj.value, regex("^\\d+\\.?\\d*$"));
+            if(isInteger){
+                Integer* i;
+                i.CALC_assign(obj.value);
+                resultStack.push(i);
+            }else if(isDecimal){
+                Decimal* d;
+                d.CALC_assign(obj.value);
+                resultStack.push(d);
+            }else{
+                try{
+                    resultStack.push(memoryer.getNumberObj(obj.value));
+                }catch(const char* s){
+                    throw s;
+                }
+            }
             
             continue;
         }
-        
+
         char op = obj.value[0];
         NumberObj *var0, *var1;
         var0 = resultStack.top();
         resultStack.pop();
-        try{
-            switch (op) {
-                case '+':
-                    var1 = resultStack.top();
-                    resultStack.pop();
-                    //var1 + var0
-                    break;
-                case '-':
-                    //-var0
-                    break;
-                case '*':
-                    var1 = resultStack.top();
-                    resultStack.pop();
-                    //var1 * var0
-                    break;
-                case '/':
-                    var1 = resultStack.top();
-                    resultStack.pop();
-                    //var1 / var0
-                    break;
-                case '!':
-                    //var0!
-                    break;
-                case '^':
-                    var1 = resultStack.top();
-                    resultStack.pop();
-                    //var1^var0
-                    break;
-                default:
-                    break;
+        var1 = resultStack.top();
+        resultStack.pop();
+        if(var0.isInteger()){
+            Integer* Ivar0 = var0;
+            if(var1.isInteger()){
+                Integer* Ivar1 = var1;
+                //
+                try{
+                    switch (op) {
+                        case '+':
+                            //var1 + var0
+                            resultStack.push(Ivar1 + Ivar0);
+                            break;
+                        case '-':
+                            //-var0
+                            resultStack.push(Ivar1);
+                            resultStack.push(-Ivar0);
+                            break;
+                        case '*':
+                            //var1 * var0
+                            resultStack.push(Ivar1 * Ivar0);
+                            break;
+                        case '/':
+                            //var1 / var0
+                            resultStack.push(Ivar1 / Ivar0);
+                            break;
+                        case '!':
+                            //var0!
+                            resultStack.push(Ivar1);
+                            resultStack.push(!Ivar0);
+                            break;
+                        case '^':
+                            //var1^var0
+                            resultStack.push(Ivar1 ^ Ivar0);
+                            break;
+                        default:
+                            break;
+                    }
+                }catch(const char* s){
+                    throw s;
+                }
+                //
+            }else{
+                Decimal* Dvar1 = var1;
+                //
+                try{
+                    switch (op) {
+                        case '+':
+                            //var1 + var0
+                            resultStack.push(Dvar1 + Ivar0);
+                            break;
+                        case '-':
+                            //-var0
+                            resultStack.push(Dvar1);
+                            resultStack.push(-Ivar0);
+                            break;
+                        case '*':
+                            //var1 * var0
+                            resultStack.push(Dvar1 * Ivar0);
+                            break;
+                        case '/':
+                            //var1 / var0
+                            resultStack.push(Dvar1 / Ivar0);
+                            break;
+                        case '!':
+                            //var0!
+                            resultStack.push(Dvar1);
+                            resultStack.push(!Ivar0);
+                            break;
+                        case '^':
+                            //var1^var0
+                            resultStack.push(Dvar1 ^ Ivar0);
+                            break;
+                        default:
+                            break;
+                    }
+                }catch(const char* s){
+                    throw s;
+                }
+                //
             }
-        }catch(const char* s){
-            cout << "ERROR : " << s << endl;
+        }else{
+            Decimal* Dvar0 = var0;
+            if(var1.isInteger()){
+                Integer* Ivar1 = var1;
+                //
+                try{
+                    switch (op) {
+                        case '+':
+                            //var1 + var0
+                            resultStack.push(Ivar1 + Dvar0);
+                            break;
+                        case '-':
+                            //-var0
+                            resultStack.push(Ivar1);
+                            resultStack.push(-Dvar0);
+                            break;
+                        case '*':
+                            //var1 * var0
+                            resultStack.push(Ivar1 * Dvar0);
+                            break;
+                        case '/':
+                            //var1 / var0
+                            resultStack.push(Ivar1 / Dvar0);
+                            break;
+                        case '!':
+                            //var0!
+                            resultStack.push(Ivar1);
+                            resultStack.push(!Dvar0);
+                            break;
+                        case '^':
+                            //var1^var0
+                            resultStack.push(Ivar1 ^ Dvar0);
+                            break;
+                        default:
+                            break;
+                    }
+                }catch(const char* s){
+                    throw s;
+                }
+                //
+            }else{
+                Decimal* Dvar1 = var1;
+                //
+                try{
+                    switch (op) {
+                        case '+':
+                            //var1 + var0
+                            resultStack.push(Dvar1 + Dvar0);
+                            break;
+                        case '-':
+                            //-var0
+                            resultStack.push(Dvar1);
+                            resultStack.push(-Dvar0);
+                            break;
+                        case '*':
+                            //var1 * var0
+                            resultStack.push(Dvar1 * Dvar0);
+                            break;
+                        case '/':
+                            //var1 / var0
+                            resultStack.push(Dvar1 / Dvar0);
+                            break;
+                        case '!':
+                            //var0!
+                            resultStack.push(Dvar1);
+                            resultStack.push(!Dvar0);
+                            break;
+                        case '^':
+                            //var1^var0
+                            resultStack.push(Dvar1 ^ Dvar0);
+                            break;
+                        default:
+                            break;
+                    }
+                }catch(const char* s){
+                    throw s;
+                }
+                //
+            }
         }
+        
+        // char op = obj.value[0];
+        // NumberObj *var0, *var1;
+        // var0 = resultStack.top();
+        // resultStack.pop();
+        // var1 = resultStack.top();
+        // resultStack.pop();
+        // try{
+        //     switch (op) {
+        //         case '+':
+        //             var1 = resultStack.top();
+        //             resultStack.pop();
+        //             //var1 + var0
+        //             break;
+        //         case '-':
+        //             //-var0
+        //             break;
+        //         case '*':
+        //             var1 = resultStack.top();
+        //             resultStack.pop();
+        //             //var1 * var0
+        //             break;
+        //         case '/':
+        //             var1 = resultStack.top();
+        //             resultStack.pop();
+        //             //var1 / var0
+        //             break;
+        //         case '!':
+        //             //var0!
+        //             break;
+        //         case '^':
+        //             var1 = resultStack.top();
+        //             resultStack.pop();
+        //             //var1^var0
+        //             break;
+        //         default:
+        //             break;
+        //     }
+        // }catch(const char* s){
+        //     cout << "ERROR : " << s << endl;
+        // }
     }
     return resultStack.top();
 }
 
-int Calculator::NumberConstruct(std::string input) {
-    return 0;
+void Calculator::NumberConstruct(Integer& self, std::string input) {
+    try{
+        PreCalculate(input);
+        Integer* i = Calculate();
+        self.CALC_assign(i->output());
+    }catch(const char* s){
+        throw s;
+    }
+}
+void Calculator::NumberConstruct(Decimal& self, std::string input) {
+    try{
+        PreCalculate(input);
+        Decimal* i = Calculate();
+        self.CALC_assign(i->output());
+    }catch(const char* s){
+        throw s;
+    }
 }
 
 bool Calculator::isPowerOn() {
@@ -241,7 +449,7 @@ bool Calculator::isPowerOn() {
 }
 
 
-NumberObj* Calculator::inputCommand(std::string input) {
+void Calculator::inputCommand(std::string input) {
     //1+2+3*4/5*-6/(7+8)+9^10!
     //1,2,+,3,4,*,5,/,6,-,*,7,8,+,/,+,9,10,!,^,+
     
@@ -256,9 +464,12 @@ NumberObj* Calculator::inputCommand(std::string input) {
     
     bool succeed = memoryer.setNumberObj(input);
     
-    return nullptr;
+    return;
     
-    PreCalculate(input);
-    
-    return Calculate();
+    try{
+        PreCalculate(input);
+        cout << Calculate() << endl;
+    }catch(const char* s){
+        cout << s << endl;
+    }
 }

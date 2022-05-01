@@ -35,7 +35,9 @@ public:
 
 	Integer operator+(const Integer);
 	Integer operator-(const Integer);
-	
+
+
+	bool isInteger(){return 1;};
 	void input(string);
 	string output();
 
