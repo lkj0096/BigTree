@@ -126,14 +126,14 @@ void Calculator::PreCalculate(std::string input) {
     ComputeStack = stack<CalcuObj>();
     SupportStack = stack<char>();
     
+    //no space
+    input = regex_replace(input, regex(" "), "");
+    
     if (input == "") { input = "0"; }
     
     input = "0+" + input;
     //normalize input -> (input)
     input = "(" + input + ")";
-
-    //no space
-    input = regex_replace(input, regex(" "), "");
 
     //[(-num) or (+num)] -> [(0-num) or (0+num)]
     input = regex_replace(input, regex("\\(-"), "(0-");
