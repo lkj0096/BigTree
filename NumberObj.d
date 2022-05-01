@@ -1,1 +1,1 @@
-NumberObj.o NumberObj.d : NumberObj.cpp numberobj.h
+numberobj.o numberobj.d : numberobj.cpp numberobj.h

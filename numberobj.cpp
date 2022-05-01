@@ -1,7 +1,7 @@
 #include "numberobj.h"
 
 ostream& operator<<(ostream& os, numberobj* ptr){
-	os << ptr->output();
+	os << ptr->output() ;
 	return os;
 }
 

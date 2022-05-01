@@ -9,6 +9,10 @@
 #ifndef numberobj_h
 #define numberobj_h
 
+#ifdef DEBUG
+#define DEBUG
+#endif // !DEBUG
+
 #include <iostream>
 using std::ostream;
 using std::istream;
@@ -21,9 +25,9 @@ using std::string;
 
 class numberobj{
 public:
-	virtual bool isInteger();
-	virtual string output();
-	virtual void input(string);
+	virtual bool isInteger() = 0;
+	virtual string output() = 0;
+	virtual void input(string) = 0;
 };
 ostream& operator<<(ostream& os, numberobj* ptr);
 istream& operator>>(istream& is, numberobj* ptr);

@@ -61,13 +61,23 @@ int main(){
 	 //cout << vector<numberobj*>({&INTa, &INTb, &INTc, &INTd, &a, &b, &c, &i});
 
 
-	 Calculator calculator;
+	//Integer A("120");
+	//Decimal B("1.5");
+	////Decimal C(B);
+	//try {
+	//	cout << (A ^ B) << endl;
+	//}
+	//catch (const char* s) {
+	//	cout << s << endl;
+	//}
 
-	 while (calculator.isPowerOn()) {
-	 	std::string str;
-	 	getline(cin, str);
-	 	calculator.inputCommand(str);
-	 }
+	Calculator calculator;
+
+	while (calculator.isPowerOn()) {
+		std::string str;
+		getline(cin, str);
+		calculator.inputCommand(str);
+	}
 }
 
 /*

@@ -43,7 +43,11 @@ public:
 
 
 	bool isInteger(){return 1;};
+	bool operator>(Integer);
+	bool operator<(Integer);
+	bool operator==(Integer);
 	void input(string);
+  void operator++();
 	string output();
 
 	bool m_posti; 		// postive == 1

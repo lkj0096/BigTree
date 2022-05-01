@@ -27,16 +27,7 @@ Integer::Integer(){
 
 Integer::Integer(string t_str){
     m_name = "_INT_CON_STR";
-#ifdef Calculator_hpp
-	try{
-		NumberConstruct(this, t_str);
-	}
-	catch(const char* s){
-		throw s;
-	}
-#else
 	this->CALC_assign(t_str);
-#endif // CALC_h
 }
 
 Integer Integer::operator=(const Integer t_Int){
@@ -48,17 +39,13 @@ Integer Integer::operator=(const Integer t_Int){
 
 Integer Integer::operator=(const string& t_str){
 	m_name = "_INT_COPY_STR";
-#ifdef Calculator_hpp
-	try{
+	try {
 		NumberConstruct(this, t_str);
+		return *this;
 	}
-	catch(const char* s){
+	catch (const char* s) {
 		throw s;
 	}
-#else 
-	this->CALC_assign(t_str);
-#endif // CALC_h
-    return *this;
 }
 
 void Integer::CALC_assign(string t_str){
@@ -79,41 +66,46 @@ void Integer::CALC_assign(string t_str){
 		if (j == '0')i++;
 		else break;
 	}
+	m_val = string(m_val, i);
 }
 
 istream& operator>> (istream& is, Integer& t_Int){
     string str;
     is >> str;
-#ifdef Calculator_hpp
-	try{
-		//Integer();
+	try {
 		NumberConstruct(&t_Int, str);
 	}
-	catch(const char* s){
+	catch (const char* s) {
 		throw s;
 	}
-#else 
-	t_Int.CALC_assign(str);
-#endif // CALC_h
-    return is;
+	return is;
 }
 
 ostream& operator<< (ostream& os, Integer t_Int){
-    os << (t_Int.m_posti?"" : "-") << t_Int.m_val;
+	if (t_Int.m_val == "") {
+		os << "0";
+	}
+	else{
+		os << (t_Int.m_posti?"" : "-") << t_Int.m_val;
+	}
     return os;
 }
 
 
 void Integer::input(string str){
-#ifdef Calculator_hpp
-	NumberConstruct(this, str);
-#else 
-	CALC_assign(str);
-#endif // CALC_h
+	try {
+		NumberConstruct(this, str);
+	}
+	catch (const char* s) {
+		throw s;
+	}
+
 }
 
 string Integer::output() {
-	return (m_posti?"" : "-") + m_val;
+	string ret = (m_posti ? "" : "-") + m_val;
+	if (ret == "-") { return ""; }
+	return ret;
 }
 
 
@@ -125,8 +117,8 @@ bool bigger(string a, string b){
 }
 
 Integer Integer::operator!(){
-	if (this->m_posti == 0) {
-		throw "!!!! Cannot use negitive number on factorial !!!!";
+	if(m_posti == 0){
+		throw "!!!! Cannot use negitive on factorial !!!!";
 	}
 	Integer T, ans("1");
 	T.m_val = m_val;
@@ -136,17 +128,22 @@ Integer Integer::operator!(){
 	}
 	return ans;
 }
-Integer Integer::operator^(const Integer ip){
-	if(ip.m_val == "0"){
-		if(this->m_val == "0"){
+Integer Integer::operator^(const Integer ip){	
+	Integer ans("1");
+	if(ip.m_posti == 0){
+		ans.CALC_assign("0");
+		return ans;
+	}
+	if (ip.m_val == "0") {
+		if (this->m_val == "0") {
 			throw "!!!! 0^0 has not defined !!!!";
-		}else{
+		}
+		else {
 			Integer ans;
 			ans.CALC_assign("1");
 			return ans;
 		}
 	}
-	Integer ans("1");
 	Integer b(*this);
 	Integer p(ip);
 	while(p.m_val!=""){
@@ -157,7 +154,42 @@ Integer Integer::operator^(const Integer ip){
 	}
 	return ans;
 }
-
+bool Integer::operator>(Integer ip) {
+	bool neg = false;
+	if (m_posti && ip.m_posti == 0) { return true; }
+	else if (m_posti == 0 && ip.m_posti) { return false; }
+	else if (m_posti == 0 && ip.m_posti == 0) { neg = true; }
+	if (m_val.size() > ip.m_val.size()) {
+		if (neg) { return false; }
+		else { return true; }
+	}
+	else if (m_val.size() < ip.m_val.size()) {
+		if (neg) {return true;}
+		else { return false; }
+	}
+	else {
+		if (m_val > ip.m_val) {
+			if (neg) { return false; }
+			else { return true; }
+		}
+		else {
+			if (neg) { return true; }
+			else { return false; }
+		}
+	}
+}
+bool Integer::operator==(Integer ip) {
+	if (ip.m_posti == m_posti&&m_val==ip.m_val) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+bool Integer::operator<(Integer ip) {
+	if ((*this) > ip || (*this) == ip) { return false; }
+	else { return true; }
+}
 Integer Integer::operator+(){
 	return *this;
 }
@@ -165,7 +197,9 @@ Integer Integer::operator-(){
 	m_posti = !m_posti;
 	return *this;
 }
-
+void Integer::operator++() {
+	(*this) = (*this) + Integer("1");
+}
 Integer Integer::operator*(const Integer ip){
 	string a(m_val), b(ip.m_val);
 	bool sign = m_posti ^ ip.m_posti;
@@ -187,9 +221,6 @@ Integer Integer::operator*(const Integer ip){
 }
 
 Integer Integer::operator/(const Integer ip){
-	if(ip.m_val == "0"){
-		throw "!!!! divided by 0 !!!!";
-	}
 	Integer aa(*this), bb(ip);
 	bool sign = aa.m_posti ^ bb.m_posti;
 	aa.m_posti = 1;
@@ -266,18 +297,20 @@ Integer Integer::operator+(const Integer ip){
 		return Integer(ans);
 	}
 	else if (m_posti == 0 && ip.m_posti) {
-		return -(-R-L);
+		// R- L+
+		return -((-R)-L);
 	}
 	else if (m_posti && ip.m_posti == 0) {
+		// R+ L-
 		return (R-(-L));
 	}
 	else if (m_posti == 0 && ip.m_posti == 0) {
+		// R- L-
 		return -((-R)+(-L));
 	}
-	
 }
 Integer Integer::operator-(const Integer ip){
-	Integer R(*this), L(ip);
+	Integer R(*this), L(ip); //R-L
 	if (m_posti && ip.m_posti) {
 		string a = m_val, b = ip.m_val, ans;
 		bool neg = 0;
@@ -307,21 +340,19 @@ Integer Integer::operator-(const Integer ip){
 		}
 		reverse(ans.begin(), ans.end());
 		while (ans.size() && *ans.begin() == '0') { ans.erase(ans.begin()); }
-		if (neg) { m_posti = false; }
+		if (neg) { ret.m_posti = false; }
 		ret.m_val = ans;
 		return ret;
 	}
 	else if (m_posti == 0 && ip.m_posti) {
-		Integer v =  -R+L;
-		v.m_posti = 0;
-		return v;
+		return -((-R) + L);
 	}
 	else if (m_posti && ip.m_posti == 0) {
-		Integer v = R + (-L);
-		v.m_posti = 1;
-		return v;
+		return R + (-L);
 	}
-	else if (m_posti == 0 && ip.m_posti == 0) {
-		return (-L) - (-R);
+	else if (m_posti == 0 && ip.m_posti == 0) { 
+		//-5 - (-3)
+		//-(5-3)
+		return -((-R) - (-L));
 	}
 }
