@@ -31,7 +31,7 @@ bool Memoryer::setNumberObj(std::string cmd){
     string expression = sm[2];
     cmd = sm[1];
 
-    bool match = regex_search(cmd, sm, regex("^([^ ]+) ([^ ]+) ([^ ]+) ?$"));
+    match = regex_search(cmd, sm, regex("^([^ ]+) ([^ ]+) ([^ ]+) ?$"));
     if(!match) return false;
 
     ///Set Integer name "=" expression
@@ -59,9 +59,9 @@ bool Memoryer::setNumberObj(std::string cmd){
     //type add var
     try{
        if(isInteger){
-           numbers[sm[3]] = Integer(expression);
+           numbers[sm[3]] = (numberobj*)new Integer(expression);
        }else{
-           numbers[sm[3]] = Decimal(expression);
+           numbers[sm[3]] = (numberobj*)new Decimal(expression);
        }
     }catch(const char* s){
         cout << s << endl;
@@ -70,7 +70,7 @@ bool Memoryer::setNumberObj(std::string cmd){
     return true;
 }
 
-NumberObj* Memoryer::getNumberObj(std::string name){
+numberobj* Memoryer::getNumberObj(std::string name){
     auto num = numbers.find(name);
     if(num != numbers.end()){
         return numbers[name];
@@ -81,7 +81,7 @@ NumberObj* Memoryer::getNumberObj(std::string name){
 
 
 void Calculator::PreCalculate(std::string input) {
-    resultStack = stack<NumberObj*>();
+    resultStack = stack<numberobj*>();
     ComputeStack = stack<CalcuObj>();
     SupportStack = stack<char>();
     //normalize input -> (input)
@@ -115,8 +115,11 @@ std::string Calculator::suffixToPrefix(std::string input) {
         }
         char op = input[0];
         input = input.substr(1, input.size() - 1);
+
+#ifdef DEBUG
         cout << "Operator : " << op << endl;
-        
+#endif // DEBUG
+                
         int level = OperatorPriority(op);
         int leftToRight = OperatorLeftToRight(op);
         
@@ -189,21 +192,26 @@ int Calculator::OperatorLeftToRight(char op){
     }
 }
 
-NumberObj* Calculator::Calculate(){
+numberobj* Calculator::Calculate(){
     CalcuObj obj;
     while(!ComputeStack.empty()){
         obj = ComputeStack.top();
+
+#ifdef DEBUG
+        cout << obj.isOperator << " " << obj.value << endl;
+#endif // DEBUG
+
         if(!obj.isOperator){
             bool isInteger = regex_match(obj.value, regex("^\\d+$"));
             bool isDecimal = regex_match(obj.value, regex("^\\d+\\.?\\d*$"));
             if(isInteger){
-                Integer* i;
-                i.CALC_assign(obj.value);
-                resultStack.push(i);
+                Integer* i = new Integer();
+                i->CALC_assign(obj.value);
+                resultStack.push((numberobj*)i);
             }else if(isDecimal){
-                Decimal* d;
-                d.CALC_assign(obj.value);
-                resultStack.push(d);
+                Decimal* d = new Decimal();
+                d->CALC_assign(obj.value);
+                resultStack.push((numberobj*)d);
             }else{
                 try{
                     resultStack.push(memoryer.getNumberObj(obj.value));
@@ -216,43 +224,50 @@ NumberObj* Calculator::Calculate(){
         }
 
         char op = obj.value[0];
-        NumberObj *var0, *var1;
+        numberobj *var0, *var1;
         var0 = resultStack.top();
         resultStack.pop();
         var1 = resultStack.top();
         resultStack.pop();
-        if(var0.isInteger()){
-            Integer* Ivar0 = var0;
-            if(var1.isInteger()){
-                Integer* Ivar1 = var1;
+        if(var0->isInteger()){
+            Integer* Ivar0 = (Integer*)var0;
+            if(var1->isInteger()){
+                Integer* Ivar1 = (Integer*)var1;
+                Integer* ans;
                 //
                 try{
                     switch (op) {
                         case '+':
                             //var1 + var0
-                            resultStack.push(Ivar1 + Ivar0);
+                            ans = new Integer(*Ivar1 + *Ivar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '-':
                             //-var0
-                            resultStack.push(Ivar1);
-                            resultStack.push(-Ivar0);
+                            resultStack.push((numberobj*)Ivar1);
+                            ans = new Integer(Ivar0->operator-());
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '*':
                             //var1 * var0
-                            resultStack.push(Ivar1 * Ivar0);
+                            ans = new Integer(*Ivar1 * *Ivar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '/':
                             //var1 / var0
-                            resultStack.push(Ivar1 / Ivar0);
+                            ans = new Integer((*Ivar1 / *Ivar0));
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '!':
                             //var0!
-                            resultStack.push(Ivar1);
-                            resultStack.push(!Ivar0);
+                            ans = new Integer(Ivar0->operator!());
+                            resultStack.push((numberobj*)Ivar1);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '^':
                             //var1^var0
-                            resultStack.push(Ivar1 ^ Ivar0);
+                            ans = new Integer(*Ivar1 ^ *Ivar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         default:
                             break;
@@ -262,35 +277,42 @@ NumberObj* Calculator::Calculate(){
                 }
                 //
             }else{
-                Decimal* Dvar1 = var1;
+                Decimal* Dvar1 = (Decimal*)var1;
+                Decimal* ans;
                 //
                 try{
                     switch (op) {
                         case '+':
                             //var1 + var0
-                            resultStack.push(Dvar1 + Ivar0);
+                            ans = new Decimal(*Dvar1 + *Ivar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '-':
                             //-var0
-                            resultStack.push(Dvar1);
-                            resultStack.push(-Ivar0);
+                            resultStack.push((numberobj*)Dvar1);
+                            ans = new Decimal(Ivar0->operator-());
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '*':
                             //var1 * var0
-                            resultStack.push(Dvar1 * Ivar0);
+                            ans = new Decimal(*Dvar1 * *Ivar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '/':
                             //var1 / var0
-                            resultStack.push(Dvar1 / Ivar0);
+                            ans = new Decimal((*Dvar1 / *Ivar0));
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '!':
                             //var0!
-                            resultStack.push(Dvar1);
-                            resultStack.push(!Ivar0);
+                            ans = new Decimal(Ivar0->operator!());
+                            resultStack.push((numberobj*)Dvar1);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '^':
                             //var1^var0
-                            resultStack.push(Dvar1 ^ Ivar0);
+                            ans = new Decimal(*Dvar1 ^ *Ivar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         default:
                             break;
@@ -301,37 +323,43 @@ NumberObj* Calculator::Calculate(){
                 //
             }
         }else{
-            Decimal* Dvar0 = var0;
-            if(var1.isInteger()){
-                Integer* Ivar1 = var1;
-                //
+            Decimal* Dvar0 = (Decimal*)var0;
+            if(var1->isInteger()){
+                Integer* Ivar1 = (Integer*)var1;
+                Decimal* ans;
                 try{
                     switch (op) {
                         case '+':
                             //var1 + var0
-                            resultStack.push(Ivar1 + Dvar0);
+                            ans = new Decimal(*Ivar1 + *Dvar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '-':
                             //-var0
-                            resultStack.push(Ivar1);
-                            resultStack.push(-Dvar0);
+                            resultStack.push((numberobj*)Ivar1);
+                            ans = new Decimal(Dvar0->operator-());
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '*':
                             //var1 * var0
-                            resultStack.push(Ivar1 * Dvar0);
+                            ans = new Decimal(*Ivar1 * *Dvar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '/':
                             //var1 / var0
-                            resultStack.push(Ivar1 / Dvar0);
+                            ans = new Decimal((*Ivar1 / *Dvar0));
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '!':
                             //var0!
-                            resultStack.push(Ivar1);
-                            resultStack.push(!Dvar0);
+                            ans = new Decimal(Dvar0->operator!());
+                            resultStack.push((numberobj*)Ivar1);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '^':
                             //var1^var0
-                            resultStack.push(Ivar1 ^ Dvar0);
+                            ans = new Decimal(*Ivar1 ^ *Dvar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         default:
                             break;
@@ -341,35 +369,42 @@ NumberObj* Calculator::Calculate(){
                 }
                 //
             }else{
-                Decimal* Dvar1 = var1;
+                Decimal* Dvar1 = (Decimal*)var1;
+                Decimal* ans;
                 //
                 try{
                     switch (op) {
                         case '+':
                             //var1 + var0
-                            resultStack.push(Dvar1 + Dvar0);
+                            ans = new Decimal(*Dvar1 + *Dvar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '-':
                             //-var0
-                            resultStack.push(Dvar1);
-                            resultStack.push(-Dvar0);
+                            resultStack.push((numberobj*)Dvar1);
+                            ans = new Decimal(Dvar0->operator-());
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '*':
                             //var1 * var0
-                            resultStack.push(Dvar1 * Dvar0);
+                            ans = new Decimal(*Dvar1 * *Dvar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '/':
                             //var1 / var0
-                            resultStack.push(Dvar1 / Dvar0);
+                            ans = new Decimal((*Dvar1 / *Dvar0));
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '!':
                             //var0!
-                            resultStack.push(Dvar1);
-                            resultStack.push(!Dvar0);
+                            ans = new Decimal(Dvar0->operator!());
+                            resultStack.push((numberobj*)Dvar1);
+                            resultStack.push((numberobj*)ans);
                             break;
                         case '^':
                             //var1^var0
-                            resultStack.push(Dvar1 ^ Dvar0);
+                            ans = new Decimal(*Dvar1 ^ *Dvar0);
+                            resultStack.push((numberobj*)ans);
                             break;
                         default:
                             break;
@@ -425,29 +460,21 @@ NumberObj* Calculator::Calculate(){
     return resultStack.top();
 }
 
-void Calculator::NumberConstruct(Integer& self, std::string input) {
-    try{
-        PreCalculate(input);
-        Integer* i = Calculate();
-        self.CALC_assign(i->output());
-    }catch(const char* s){
-        throw s;
-    }
-}
-void Calculator::NumberConstruct(Decimal& self, std::string input) {
-    try{
-        PreCalculate(input);
-        Decimal* i = Calculate();
-        self.CALC_assign(i->output());
-    }catch(const char* s){
-        throw s;
-    }
-}
-
 bool Calculator::isPowerOn() {
     return true;
 }
 
+template <typename T>
+void traverseStack(std::stack<T>& stk) {
+    if (stk.empty()) {
+        return;
+    }
+    T x = stk.top();
+    std::cout << x.value << " ";
+    stk.pop();
+    traverseStack(stk);
+    stk.push(x);
+}
 
 void Calculator::inputCommand(std::string input) {
     //1+2+3*4/5*-6/(7+8)+9^10!
@@ -464,12 +491,43 @@ void Calculator::inputCommand(std::string input) {
     
     bool succeed = memoryer.setNumberObj(input);
     
-    return;
+    //return;
     
     try{
         PreCalculate(input);
+#ifdef DEBUG
+        cout << "\nstart calc\n";
+#endif // DEBUG
+
         cout << Calculate() << endl;
     }catch(const char* s){
         cout << s << endl;
     }
 }
+
+
+void NumberConstruct(Integer* self, std::string input) {
+    try {
+        Calculator calc;
+        calc.PreCalculate(input);
+        Integer* i = (Integer*)calc.Calculate();
+        self->CALC_assign(i->output());
+    }
+    catch (const char* s) {
+        throw s;
+    }
+}
+
+void NumberConstruct(Decimal* self, std::string input) {
+
+    try {
+        Calculator calc;
+        calc.PreCalculate(input);
+        Decimal* i = (Decimal*)calc.Calculate();
+        self->CALC_assign(i->output());
+    }
+    catch (const char* s) {
+        throw s;
+    }
+}
+

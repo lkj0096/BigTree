@@ -1,4 +1,5 @@
 #include "Decimal.h"
+#include "Calculator.h"
 #include <iostream>
 using std::ostream;
 using std::istream;
@@ -40,7 +41,7 @@ Decimal::Decimal(const Integer t_Int) : Integer{} {
 Decimal::Decimal(const string t_str) : Integer{} {
 	m_name = "_DEC_CON_DEC";
 #ifdef Calculator_hpp
-	NumberConstruct(*this, str);
+	NumberConstruct(this, t_str);
 #else
 	m_num = Integer();
 	m_num.CALC_assign("1");
@@ -68,7 +69,7 @@ Decimal Decimal::operator=(Integer t_Int) {
 Decimal Decimal::operator=(string t_str) {
 	m_name = "_DEC_ASS_STR";
 #ifdef Calculator_hpp
-	 NumberConstruct(*this, str);
+	 NumberConstruct(this, t_str);
 #else 
 	this->CALC_assign(t_str);
 #endif // CALC_h
@@ -95,9 +96,9 @@ istream& operator>> (istream& is, Decimal& t_Dec) {
 	is >> str;
 #ifdef Calculator_hpp
 	try{
-		NumberConstruct(*this, str);
+		NumberConstruct(&t_Dec, str);
 	}catch(const char* s){
-		throws s;
+		throw s;
 	}
 #else
 	t_Dec.CALC_assign(str);
@@ -128,32 +129,35 @@ ostream& operator<< (ostream& os, Decimal t_Dec) {
 void Decimal::input(string str){
 #ifdef Calculator_hpp
 	try{
-		NumberConstruct(*this, str);
+		NumberConstruct(this, str);
 	}catch(const char* s){
-		throws s;
+		throw s;
 	}
 #else
-	t_Dec.CALC_assign(str);
+	CALC_assign(str);
 #endif // CALC_h
 }
 
 string Decimal::output(){
-	string opt = ((m_num.m_posti ^ m_denum.m_posti) ? "-" : "");
 	
 	Integer Rv(m_num.m_val + string(100, '0'));
 	
 	Rv = Rv / m_denum;
 	
-	opt += Rv.m_val;
+	string opt = Rv.m_val;
 	
+	
+
 	if (opt.length() < 100) {
-		opt += string(100 - opt.length(), '0') + opt;
+		opt = string(100 - opt.length(), '0') + opt;
 	}
 	
 	opt.insert(opt.end() - 100, '.');
 	
 	opt = (opt.length() == 101 ? "0" : "") + opt;
 	
+	opt = ((m_num.m_posti ^ m_denum.m_posti) ? "-" : "") + opt;
+
 	return opt;
 }
 //---------------------------------------------
@@ -172,20 +176,20 @@ void swap(Integer& a, Integer& b) {
 
 Decimal Decimal::operator!() {
 #ifdef Calculator_hpp
-	throw "!!!! Can't use Factorial Decimal !!!!";
+	throw "!!!! Cannot Factorial Decimal !!!!";
 
 #else
-	std::cout << "!!!! Can't use Factorial Decimal !!!!" << std::endl;
+	std::cout << "!!!! Cannot Factorial Decimal !!!!" << std::endl;
 #endif // DEBUG  
 	return *this;
 }
 
 
 Decimal Decimal::operator^(const Decimal ip){
-#ifdef CALC_h
-	throw "!!!! Can't use Decimal on exponent !!!!";
+#ifdef Calculator_hpp
+	throw "!!!! Cannot use Decimal on exponent !!!!";
 #else
-	std::cout << "!!!! Can't use Decimal on exponent !!!!" << std::endl;
+	std::cout << "!!!! Cannot use Decimal on exponent !!!!" << std::endl;
 #endif // CALC_h
 	return *this;
 }
@@ -194,9 +198,9 @@ Decimal Decimal::operator^(const Integer ip){
 		if(ip.m_val == "0"){
 			throw "!!!! 0^0 has not defined !!!!";
 		}else{
-			Integer ans();
+			Integer ans;
 			ans.CALC_assign("1");
-			return ans;
+			return Decimal(ans, ans);
 		}
 	}
 	Integer v = ip;
@@ -208,7 +212,7 @@ Decimal Decimal::operator^(const Integer ip){
 	return ans;
 }
 Decimal operator^(const Integer a, const Decimal b){
-#ifdef CALC_h
+#ifdef Calculator_hpp
 	throw "!!!! Can't use Decimal on exponent !!!!";
 #else
 	std::cout << "!!!! Can't use Decimal on exponent !!!!" << std::endl;
@@ -249,7 +253,13 @@ Decimal Decimal::operator/(const Decimal ip){
 	return ans;
 }
 Decimal Decimal::operator/(const Integer ip){
-	Decimal ans(*(this));
+
+	if (ip.m_val == "0") {
+		throw "!!!! divided by 0 !!!!";
+		return Decimal();
+	}
+
+	Decimal ans(*this);
 	Integer v(ip);
 	if (v.m_posti == 0) {
 		v.m_posti = 1;

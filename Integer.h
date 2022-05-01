@@ -1,7 +1,12 @@
+
+#ifdef DEBUG
+#define DEBUG
+#endif // !DEBUG
+
 #ifndef Integer_h
 #define Integer_h
 
-#include "Calculator.hpp"
+//#include "Calculator.h"
 #include "numberobj.h"
 #include <iostream>
 using std::ostream;

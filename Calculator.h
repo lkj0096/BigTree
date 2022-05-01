@@ -5,6 +5,8 @@
 //  Created by 林士傑 on 2022/4/27.
 //
 
+#define DEBUG
+
 #ifndef Calculator_hpp
 #define Calculator_hpp
 
@@ -12,7 +14,9 @@
 #include <vector>
 #include <stack>
 #include <map>
-#include "NumberObj.hpp"
+#include "numberobj.h"
+#include "Integer.h"
+#include "Decimal.h"
 
 #endif /* Calculator_hpp */
 
@@ -27,33 +31,37 @@ public:
     CalcuObj(bool, std::string);
 };
 
-class Memoryer{
+class Memoryer {
 public:
-    std::map<std::string, NumberObj*> numbers;
+    std::map<std::string, numberobj*> numbers;
     bool setNumberObj(std::string cmd);
-    NumberObj* getNumberObj(std::string name);
+    numberobj* getNumberObj(std::string name);
 };
 
 
 class Calculator {
 private:
-    std::stack<NumberObj*> resultStack;
+    std::stack<numberobj*> resultStack;
     std::stack<CalcuObj> ComputeStack;
     std::stack<char> SupportStack;
-    
+
     Memoryer memoryer;
-    
+
     void PreCalculate(std::string input);
-    
+
     std::string suffixToPrefix(std::string input);
     void TakeSupportStack(int priority);
     int OperatorPriority(char op);
     int OperatorLeftToRight(char op);
-    
-    NumberObj* Calculate();
-    
+
+    numberobj* Calculate();
+
 public:
     bool isPowerOn();
-    NumberObj* inputCommand(std::string input);
-    static int NumberConstruct(std::string input);
+    void inputCommand(std::string input);
+    friend void NumberConstruct(Integer* self, std::string input);
+    friend void NumberConstruct(Decimal* self, std::string input);
 };
+
+void NumberConstruct(Integer* self, std::string input);
+void NumberConstruct(Decimal* self, std::string input);

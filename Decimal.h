@@ -1,7 +1,12 @@
+
+#ifdef DEBUG
+#define DEBUG
+#endif // !DEBUG
+
 #ifndef Decimal_h
 #define Decimal_h
 
-#include "Calculator.hpp"
+//#include "Calculator.h"
 #include "Integer.h"
 #include <iostream>
 using std::ostream;

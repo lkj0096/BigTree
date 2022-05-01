@@ -1,4 +1,5 @@
-has #include "Integer.h"
+#include "Integer.h"
+#include "Calculator.h"
 #include <iostream>
 using std::ostream;
 using std::istream;
@@ -28,7 +29,7 @@ Integer::Integer(string t_str){
     m_name = "_INT_CON_STR";
 #ifdef Calculator_hpp
 	try{
-		NumberConstruct(*this, t_str);
+		NumberConstruct(this, t_str);
 	}
 	catch(const char* s){
 		throw s;
@@ -49,7 +50,7 @@ Integer Integer::operator=(const string& t_str){
 	m_name = "_INT_COPY_STR";
 #ifdef Calculator_hpp
 	try{
-		NumberConstruct(*this, t_str);
+		NumberConstruct(this, t_str);
 	}
 	catch(const char* s){
 		throw s;
@@ -85,7 +86,8 @@ istream& operator>> (istream& is, Integer& t_Int){
     is >> str;
 #ifdef Calculator_hpp
 	try{
-		NumberConstruct(*this, str);
+		//Integer();
+		NumberConstruct(&t_Int, str);
 	}
 	catch(const char* s){
 		throw s;
@@ -102,9 +104,9 @@ ostream& operator<< (ostream& os, Integer t_Int){
 }
 
 
-void Integer::input(string& str){
+void Integer::input(string str){
 #ifdef Calculator_hpp
-	NumberConstruct(*this, str);
+	NumberConstruct(this, str);
 #else 
 	CALC_assign(str);
 #endif // CALC_h
@@ -123,6 +125,9 @@ bool bigger(string a, string b){
 }
 
 Integer Integer::operator!(){
+	if (this->m_posti == 0) {
+		throw "!!!! Cannot use negitive number on factorial !!!!";
+	}
 	Integer T, ans("1");
 	T.m_val = m_val;
 	while(T.m_val!="1"){
@@ -136,7 +141,7 @@ Integer Integer::operator^(const Integer ip){
 		if(this->m_val == "0"){
 			throw "!!!! 0^0 has not defined !!!!";
 		}else{
-			Integer ans();
+			Integer ans;
 			ans.CALC_assign("1");
 			return ans;
 		}
