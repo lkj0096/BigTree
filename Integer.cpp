@@ -194,8 +194,9 @@ Integer Integer::operator+(){
 	return *this;
 }
 Integer Integer::operator-(){
-	m_posti = !m_posti;
-	return *this;
+	Integer ans(*this);
+	ans.m_posti = !m_posti;
+	return ans;
 }
 void Integer::operator++() {
 	(*this) = (*this) + Integer("1");

@@ -5,6 +5,8 @@
 //  Created by 林士傑 on 2022/4/27.
 //
 
+#define coutline cout << "Line " << __LINE__ << " : "
+
 #include "numberobj.h"
 #include "Integer.h"
 #include "Decimal.h"
@@ -41,7 +43,7 @@ bool Memoryer::setNumberObj(std::string cmd) {
             string ccc = sm[1];
             ccc = regex_replace(ccc, regex(" "), "");
 #ifdef DEBUG
-            cout << "----------@@" << ccc << endl;
+            coutline << "----------@@" << ccc << endl;
 #endif
             num = getNumberObj(ccc);
         }
@@ -51,7 +53,7 @@ bool Memoryer::setNumberObj(std::string cmd) {
         string sss = sm[2];
         sss = regex_replace(sss, regex(" "), "");
 #ifdef DEBUG
-        cout << "----------@@" << sss << "@@----------" << endl;
+        coutline << "----------@@" << sss << "@@----------" << endl;
 #endif // DEBUG
         try {
             num->input(sss);
@@ -120,7 +122,7 @@ numberobj* Memoryer::getNumberObj(std::string name) {
 
 void Calculator::PreCalculate(std::string input) {
 #ifdef DEBUG
-        cout << "Line " << __LINE__ << " :: " << "PreCalculate" << endl;
+    coutline << " :: " << "PreCalculate" << endl;
 #endif // DEBUG
     resultStack = stack<numberobj*>();
     ComputeStack = stack<CalcuObj>();
@@ -163,7 +165,17 @@ void Calculator::PreCalculate(std::string input) {
     }
     input = rrrr;
 
-    
+    try {
+        input = regex_replace(input, regex("\\^\\+\\-([^\\(\\)\\*\\/]*)"), "^(+-$1)");
+        input = regex_replace(input, regex("\\(\\+"), "(0+");
+#ifdef DEBUG
+        coutline << input << endl;
+#endif // DEBUG
+    }
+    catch (const char* s) {
+        throw s;
+    }
+
     try {
         suffixToPrefix(input);
     }
@@ -175,7 +187,7 @@ void Calculator::PreCalculate(std::string input) {
     while (!ComputeStack.empty()) {
         temp = ComputeStack.top();
 #ifdef DEBUG
-        cout << temp.value << "\n";
+        coutline << temp.value << "\n";
 #endif // DEBUG
         re.push(temp);
         ComputeStack.pop();
@@ -197,7 +209,7 @@ std::string Calculator::suffixToPrefix(std::string input) {
         input = input.substr(1, input.size() - 1);
 
 #ifdef DEBUG
-        cout << "Line " << __LINE__ << " :: " << "Operator : " << op << endl;
+        //coutline << " :: " << "Operator : " << op << endl;
 #endif // DEBUG
 
         int level = OperatorPriority(op);
@@ -278,7 +290,7 @@ numberobj* Calculator::Calculate() {
         obj = ComputeStack.top();
 
 #ifdef DEBUG
-        cout << obj.isOperator << " " << obj.value << endl;
+        coutline << obj.isOperator << " " << obj.value << endl;
 #endif // DEBUG
 
         if (!obj.isOperator) {
@@ -508,6 +520,9 @@ numberobj* Calculator::Calculate() {
                 //
             }
         }
+#ifdef DEBUG
+        cout << "Line " << __LINE__ << " : " << resultStack.top()->output() <<"\n";
+#endif // DEBUG
         //cout << "\nruned" << endl;
         ComputeStack.pop();
         // char op = obj.value[0];

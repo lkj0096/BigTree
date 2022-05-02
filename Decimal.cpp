@@ -354,8 +354,9 @@ Decimal Decimal::operator+() {
 	return (*this);
 }
 Decimal Decimal::operator-() {
-	m_num.m_posti = !m_num.m_posti;
-	return (*this);
+	Decimal ans(*this);
+	ans.m_num.m_posti = !m_num.m_posti;
+	return ans;
 }
 
 Decimal Decimal::operator*(const Decimal ip) {
