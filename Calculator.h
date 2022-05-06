@@ -33,7 +33,7 @@ public:
 
 class Memoryer {
 public:
-    std::map<std::string, numberobj*> numbers;
+    static std::map<std::string, numberobj*> numbers;
     bool setNumberObj(std::string cmd);
     numberobj* getNumberObj(std::string name);
 };

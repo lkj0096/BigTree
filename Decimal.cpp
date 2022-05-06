@@ -375,10 +375,16 @@ Decimal operator*(const Integer a, const Decimal b) {
 	ans.m_num = ans.m_num * a;
 	return ans;
 }
+
+#define coutline cout << "Line " << __LINE__ << " : "
+
 Decimal Decimal::operator/(const Decimal ip) {
-	if (ip.m_num.m_val == "0") {
+
+#ifdef DEBUG
+	coutline << ip.m_num.m_val << endl;
+#endif // DEBUG
+	if (ip.m_num.m_val == "") {
 		throw "!!!! divided by 0 !!!!";
-		return Decimal();
 	}
 	Decimal v(ip.m_denum, ip.m_num);
 	v.m_num.m_posti = v.m_denum.m_posti ^ v.m_num.m_posti;
@@ -387,11 +393,13 @@ Decimal Decimal::operator/(const Decimal ip) {
 	Decimal ans((*this) * v);
 	return ans;
 }
-Decimal Decimal::operator/(const Integer ip) {
 
-	if (ip.m_val == "0") {
+Decimal Decimal::operator/(const Integer ip) {
+#ifdef DEBUG
+	coutline << ip.m_val << endl;
+#endif // DEBUG
+	if (ip.m_val == "") {
 		throw "!!!! divided by 0 !!!!";
-		return Decimal();
 	}
 
 	Decimal ans(*this);
@@ -408,10 +416,15 @@ Decimal Decimal::operator/(const Integer ip) {
 }
 Decimal operator/(const Integer a, const Decimal b) {
 	//std::cout << b;
+#ifdef DEBUG
+	coutline << b.m_num.m_val << endl;
+#endif // DEBUG
 	Decimal v(b.m_denum, b.m_num);
-
+	if (b.m_num.m_val == "") {
+		throw "!!!! divided by 0 !!!!";
+	}
 	v = v * Decimal(a);
-	return b;
+	return v;
 }
 
 Decimal Decimal::operator+(const Decimal ip) {

@@ -17,6 +17,8 @@
 
 using namespace std;
 
+std::map<std::string, numberobj*> Memoryer::numbers = {};
+
 CalcuObj::CalcuObj() {}
 
 CalcuObj::CalcuObj(bool b, std::string s) {
@@ -166,8 +168,13 @@ void Calculator::PreCalculate(std::string input) {
     input = rrrr;
 
     try {
+
         input = regex_replace(input, regex("\\^\\+\\-([^\\(\\)\\*\\/]*)"), "^(+-$1)");
+        input = regex_replace(input, regex("\\*\\+\\-([^\\(\\)\\*\\/]*)"), "*(+-$1)");
+        input = regex_replace(input, regex("\\/\\+\\-([^\\(\\)\\*\\/]*)"), "/(+-$1)");
         input = regex_replace(input, regex("\\(\\+"), "(0+");
+        
+
 #ifdef DEBUG
         coutline << input << endl;
 #endif // DEBUG

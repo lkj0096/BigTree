@@ -222,6 +222,10 @@ Integer Integer::operator*(const Integer ip){
 }
 
 Integer Integer::operator/(const Integer ip){
+
+	if (ip.m_val == "") {
+		throw "!!!! divided by 0 !!!!";
+	}
 	Integer aa(*this), bb(ip);
 	bool sign = aa.m_posti ^ bb.m_posti;
 	aa.m_posti = 1;
