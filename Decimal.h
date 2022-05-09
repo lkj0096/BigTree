@@ -24,10 +24,14 @@ public:
 	Decimal();
 	Decimal(const Decimal&);
 	Decimal(const Integer);
-	Decimal(const string);
+	Decimal(string);
+	Decimal(const char* t_str);
+
 	Decimal operator=(Decimal);
 	Decimal operator=(Integer);
 	Decimal operator=(string);
+	Decimal operator=(const char*);
+
 	Decimal(const Integer, const Integer);
 	void CALC_assign(string);
 

@@ -5,7 +5,7 @@
 //  Created by 林士傑 on 2022/4/27.
 //
 
-#define DEBUG
+//#define DEBUG
 
 #ifndef Calculator_hpp
 #define Calculator_hpp

@@ -23,9 +23,13 @@ public:
 	string m_name;
 	Integer();
 	Integer(string);
+	Integer(const char*);
 	Integer(const Integer&);
+
+
 	Integer operator=(const Integer);
-	Integer operator=(const string&);
+	Integer operator=(string);
+	Integer operator=(const char*);
 
 	void CALC_assign(string);
 

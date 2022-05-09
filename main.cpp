@@ -2,6 +2,14 @@
 #define DEBUG
 #endif // !DEBUG
 
+#ifndef API1
+//#define API1
+#endif // !DEBUG
+
+#ifndef API2
+#define API2
+#endif // !DEBUG
+
 #include <iostream>
 using std::ostream;
 using std::istream;
@@ -20,68 +28,43 @@ using std::string;
 #include "Integer.h"
 #include "Decimal.h"
 
-template<typename T>
-ostream& operator<<(ostream& os, vector<T> vec) {
-	for (T i : vec) {
-		os << i << endl;
-	}
-	return os;
-}
-
-
 int main(){
-	//Decimal a(Integer("987580089"), Integer("35645615646541564")), b("-0.5"), c("0.5"), d("1"), e("-1");
 
-	//Decimal f = a + b;
-	//Decimal g = a - b;
-	//Decimal h = a * b;
-	//Decimal i = a / b;
+#ifdef API1
+	Integer x;
+	Decimal y;
 
-	////cout << vector<Decimal>({ a,b,c,d,e,f,g,h,i });
+	cin >> x; // ¿é¤J 123456789
+	cin >> y; // ¿é¤J 3.1415926
 
-	//Integer INTa("0"), INTb("1000."), INTc("-0.5"), INTd("0.5"), INTe("1132515641036546145346546313");
-	//Integer INTf = INTa + INTb;
-	//Integer INTg = INTa - INTb;
-	//Integer INTh = INTa * INTb;
-	//Integer INTi = INTa / INTb;
-	//
-	//try {
-	//	!a;
-	//	!INTa;
-	//	//cout << vector<Decimal>({ a + INTa, a - INTa , a * INTa , a / INTa });
-	//	//cout << vector<Decimal>({ INTa + a, INTa - a , INTa * a , INTa / a });
-	//}
-	//catch (const char* s) {
-	//	cout << s << endl;
-	//}
-	 
+	cout << x + y << endl;
+	cout << x - y << endl;
+	cout << x * y << endl;
+	cout << x / y << endl;
+#else 
+#ifdef API2
+	Integer x = "123 * 8 + 456";
+	Decimal y = "-1.0 / 3 - 45 / 13.0";
 
-	// cout << vector<Integer>({ INTa,INTb,INTc,INTd,INTe,INTf,INTg,INTh,INTi });
+	vector<numberobj*> nums;
+	nums.push_back(&x);
+	nums.push_back(&y);
+	for (const auto& num : nums)
+	cout << num << endl;
 
-	 //cout << vector<numberobj*>({&INTa, &INTb, &INTc, &INTd, &a, &b, &c, &i});
-
-
-	//Integer A("120");
-	//Decimal B("1.5");
-	////Decimal C(B);
-	//try {
-	//	cout << (A ^ B) << endl;
-	//}
-	//catch (const char* s) {
-	//	cout << s << endl;
-	//}
-
+#else
 	Calculator calculator;
-
 	while (calculator.isPowerOn()) {
 		std::string str;
 		getline(cin, str);
-		calculator.inputCommand(str);
+		try {
+			calculator.inputCommand(str);
+		}
+		catch (const char* errstr) {
+			cout << errstr << endl;
+		}
 	}
+#endif
+#endif // API
+	
 }
-
-/*
-
-Decimal ostream undone
-
-*/

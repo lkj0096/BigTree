@@ -26,8 +26,18 @@ Integer::Integer(){
  }
 
 Integer::Integer(string t_str){
-    m_name = "_INT_CON_STR";
+	m_name = "_INT_CON_STR";
 	this->CALC_assign(t_str);
+}
+
+Integer::Integer(const char* t_str) {
+	m_name = "_INT_CON_STR";
+	try {
+		NumberConstruct(this, string(t_str));
+	}
+	catch (const char* s) {
+		throw s;
+	}
 }
 
 Integer Integer::operator=(const Integer t_Int){
@@ -37,10 +47,21 @@ Integer Integer::operator=(const Integer t_Int){
     return *this;
 }
 
-Integer Integer::operator=(const string& t_str){
+Integer Integer::operator=(string t_str){
 	m_name = "_INT_COPY_STR";
 	try {
 		NumberConstruct(this, t_str);
+		return *this;
+	}
+	catch (const char* s) {
+		throw s;
+	}
+}
+
+Integer Integer::operator=(const char* t_str){
+	m_name = "_INT_COPY_STR";
+	try {
+		NumberConstruct(this, string(t_str));
 		return *this;
 	}
 	catch (const char* s) {

@@ -145,36 +145,19 @@ void Calculator::PreCalculate(std::string input) {
 
     //[num-num] -> [num+-num]
     input = regex_replace(input, regex("([^\\(\\)\\!\\^\\+\\-\\*\\/])-"), "$1+-");
+#ifdef DEBUG
+    coutline << input << endl;
+#endif // DEBUG
 
-    //fix positive and negative
-    //spaghetti
-    string rrrr = input;
-    regex pone("[\\-\\+]+");
-    std::sregex_iterator words_begin = std::sregex_iterator(input.begin(), input.end(), pone);
-    std::sregex_iterator words_end = std::sregex_iterator();
-    for (std::sregex_iterator i = words_begin; i != words_end; i++) {
-        string st = (*i).str();
-        regex ne("\\-");
-        auto pone_st = std::sregex_iterator(st.begin(), st.end(), ne);
-        auto pone_en = std::sregex_iterator();
-        int count = std::distance(pone_st, pone_en);
-        string resu = "+";
-        if (count % 2) resu += "-";
-        string sss = rrrr.substr(0, rrrr.find(st));
-        sss += resu;
-        sss += rrrr.substr(rrrr.find(st) + st.length(), rrrr.length() - rrrr.find(st) - st.length());
-        rrrr = sss;
-    }
-    input = rrrr;
-
+#ifdef DEBUG
+    coutline << input << endl;
+#endif // DEBUG
     try {
 
         input = regex_replace(input, regex("\\^\\+\\-([^\\(\\)\\*\\/]*)"), "^(+-$1)");
         input = regex_replace(input, regex("\\*\\+\\-([^\\(\\)\\*\\/]*)"), "*(+-$1)");
         input = regex_replace(input, regex("\\/\\+\\-([^\\(\\)\\*\\/]*)"), "/(+-$1)");
         input = regex_replace(input, regex("\\(\\+"), "(0+");
-        
-
 #ifdef DEBUG
         coutline << input << endl;
 #endif // DEBUG
@@ -203,6 +186,8 @@ void Calculator::PreCalculate(std::string input) {
 }
 
 std::string Calculator::suffixToPrefix(std::string input) {
+    int numberCount = 0, opCount = 1;
+
     while (input.size()) {
         std::smatch sm;
         bool isNotOperator = regex_search(input, sm, regex("^[^\\(\\)\\!\\^\\+\\-\\*\\/]+"));
@@ -210,6 +195,8 @@ std::string Calculator::suffixToPrefix(std::string input) {
             string str = sm[0];
             ComputeStack.push(CalcuObj(false, str));
             input = input.substr(str.size(), input.size() - str.size());
+
+            numberCount++;
             continue;
         }
         char op = input[0];
@@ -226,9 +213,10 @@ std::string Calculator::suffixToPrefix(std::string input) {
         case '+':
         case '*':
         case '/':
-        case '-':
         case '^':
+            opCount++;
         case '!':
+        case '-':
             TakeSupportStack(level + leftToRight);
             SupportStack.push(op);
             break;
@@ -244,6 +232,9 @@ std::string Calculator::suffixToPrefix(std::string input) {
         }
     }
     TakeSupportStack(6);
+    if (opCount != numberCount) {
+        throw ("Syntx error");
+    }
     return "";
 }
 

@@ -18,6 +18,7 @@ Decimal::Decimal() : Integer{} {
 	m_denum = Integer();
 	m_denum.CALC_assign("1");
 }
+
 Decimal::Decimal(const Decimal& t_Dec) : Integer{} {
 	m_name = "_DEC_CON_DEC";
 	m_num = t_Dec.m_num;
@@ -39,7 +40,7 @@ Decimal::Decimal(const Integer t_Int) : Integer{} {
 	m_denum.CALC_assign("1");
 }
 
-Decimal::Decimal(const string t_str) : Integer{} {
+Decimal::Decimal(string t_str) : Integer{} {
 	m_name = "_DEC_CON_STR";
 
 	m_num = Integer();
@@ -48,7 +49,21 @@ Decimal::Decimal(const string t_str) : Integer{} {
 	m_denum.CALC_assign("1");
 
 	this->CALC_assign(t_str);
+}
 
+Decimal::Decimal(const char* t_str) : Integer{} {
+	m_name = "_DEC_CON_STR";
+
+	m_num = Integer();
+	m_num.CALC_assign("1");
+	m_denum = Integer();
+	m_denum.CALC_assign("1");
+	try {
+		NumberConstruct(this, string(t_str));
+	}
+	catch (const char* s) {
+		throw s;
+	}
 }
 
 Decimal Decimal::operator=(Decimal t_Dec) {
@@ -76,6 +91,18 @@ Decimal Decimal::operator=(string t_str) {
 	return *this;
 }
 
+Decimal Decimal::operator=(const char* t_str) {
+	m_name = "_DEC_ASS_STR";
+
+	try {
+		NumberConstruct(this, string(t_str));
+	}
+	catch (const char* s) {
+		throw s;
+	}
+	return *this;
+}
+
 void Decimal::CALC_assign(string t_str) {
 	//t_str = regex_replace(t_str, regex("^0*"), "");
 	//0.0 -> .0
@@ -89,7 +116,7 @@ void Decimal::CALC_assign(string t_str) {
 		cnt = t_str.length();
 	}
 
-	m_num = Integer(t_str);
+	m_num.CALC_assign(t_str);
 	m_denum.CALC_assign(string("1" + string(t_str.length() - cnt, '0')));
 }
 
@@ -173,7 +200,13 @@ void swap(Integer& a, Integer& b) {
 
 Decimal Decimal::operator!() {
 #ifdef Calculator_hpp
-	throw "!!!! Cannot Factorial Decimal !!!!";
+	Integer a(m_num / m_denum * m_denum);
+	if (a == m_num) {
+		m_num = !(m_num / m_denum) * m_denum;
+	}
+	else {
+		throw "!!!! Cannot Factorial Decimal !!!!";
+	}
 #else
 	std::cout << "!!!! Cannot Factorial Decimal !!!!" << std::endl;
 #endif // DEBUG  
@@ -404,13 +437,9 @@ Decimal Decimal::operator/(const Integer ip) {
 
 	Decimal ans(*this);
 	Integer v(ip);
-	if (v.m_posti == 0) {
-		v.m_posti = 1;
-		ans.m_num.m_posti = 0;
-	}
-	else {
-		ans.m_num.m_posti = 1;
-	}
+	
+	ans.m_num.m_posti = !(v.m_posti ^ ans.m_num.m_posti);
+
 	ans.m_denum = ans.m_denum * v;
 	return ans;
 }
