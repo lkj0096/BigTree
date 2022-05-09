@@ -233,7 +233,7 @@ std::string Calculator::suffixToPrefix(std::string input) {
     }
     TakeSupportStack(6);
     if (opCount != numberCount) {
-        throw ("Syntx error");
+        throw ("syntax error");
     }
     return "";
 }

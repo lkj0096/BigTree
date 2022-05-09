@@ -1,5 +1,5 @@
 #ifndef DEBUG
-#define DEBUG
+//#define DEBUG
 #endif // !DEBUG
 
 #ifndef API1
@@ -7,7 +7,7 @@
 #endif // !DEBUG
 
 #ifndef API2
-#define API2
+//#define API2
 #endif // !DEBUG
 
 #include <iostream>
